@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Land Deal Analyzer</title>
+<style>
+:root {
+  --ds-bg:#0d1b2a;--ds-surface:#132336;--ds-surface2:#1a2e45;
+  --ds-border:rgba(126,200,160,0.15);--ds-border-md:rgba(126,200,160,0.28);
+  --ds-green:#7ec8a0;--ds-green-dim:#4d9970;--ds-green-hi:#a8dbbe;
+  --ds-white:#f0f4f8;--ds-white-dim:rgba(240,244,248,0.55);
+  --ds-white-faint:rgba(240,244,248,0.25);
+  --ds-danger:#e07070;--ds-warn:#d4a64a;--ds-radius:8px;--ds-radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-serif;padding:1.5rem;}
+.ds-card{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:var(--ds-radius-lg);padding:1.25rem;margin-bottom:14px;}
+.ds-section-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ds-green-dim);margin-bottom:12px;}
+.ds-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ds-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.ds-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.ds-field{display:flex;flex-direction:column;gap:5px;}
+.ds-field label{font-size:11px;color:var(--ds-white-dim);}
+.ds-field input,.ds-field select,.ds-field textarea{
+  background:var(--ds-surface2);border:1px solid var(--ds-border);
+  border-radius:var(--ds-radius);color:var(--ds-white);
+  font-family:inherit;font-size:13px;padding:0 10px;height:34px;width:100%;outline:none;
+}
+.ds-field input:focus,.ds-field select:focus,.ds-field textarea:focus{border-color:var(--ds-green-dim);}
+.ds-field select option{background:#132336;}
+.ds-field textarea{height:auto;min-height:68px;padding:8px 10px;resize:vertical;line-height:1.5;}
+.comp-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 32px;gap:6px;margin-bottom:5px;}
+.comp-header span{font-size:10px;color:var(--ds-white-faint);}
+.comp-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 32px;gap:6px;align-items:center;margin-bottom:6px;}
+.comp-row input{height:32px;padding:0 8px;background:var(--ds-surface2);border:1px solid var(--ds-border);border-radius:var(--ds-radius);color:var(--ds-white);font-size:12px;font-family:inherit;width:100%;outline:none;}
+.btn-add-comp{width:100%;margin-top:6px;background:transparent;border:1px dashed var(--ds-border-md);border-radius:var(--ds-radius);color:var(--ds-green-dim);font-size:12px;font-family:inherit;cursor:pointer;padding:7px;}
+.btn-add-comp:hover{background:var(--ds-surface2);color:var(--ds-green);}
+.btn-del{background:transparent;border:1px solid var(--ds-border);border-radius:var(--ds-radius);color:var(--ds-white-faint);font-size:14px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.btn-del:hover{border-color:var(--ds-danger);color:var(--ds-danger);}
+.btn-analyze{width:100%;height:42px;background:var(--ds-green);border:none;border-radius:var(--ds-radius);color:#0d1b2a;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:6px;}
+.btn-analyze:hover{background:var(--ds-green-hi);}
+.ds-metric{background:var(--ds-surface2);border:1px solid var(--ds-border);border-radius:var(--ds-radius);padding:14px;}
+.ds-metric-label{font-size:11px;color:var(--ds-white-dim);margin-bottom:5px;}
+.ds-metric-val{font-size:20px;font-weight:500;color:var(--ds-green);}
+.ds-metric-sub{font-size:11px;color:var(--ds-white-faint);margin-top:3px;}
+.ds-rating-wrap{background:var(--ds-surface2);border-radius:4px;height:6px;margin:8px 0 4px;overflow:hidden;}
+.ds-rating-bar{height:100%;border-radius:4px;transition:width 0.7s ease;}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--ds-radius);}
+.badge-ok{background:rgba(126,200,160,0.15);color:var(--ds-green);}
+.badge-warn{background:rgba(212,166,74,0.15);color:var(--ds-warn);}
+.badge-bad{background:rgba(224,112,112,0.15);color:var(--ds-danger);}
+.price-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--ds-border);font-size:13px;}
+.price-row:last-child{border-bottom:none;}
+.price-key{color:var(--ds-white-dim);}
+.price-val{font-weight:500;}
+.price-val.big{font-size:17px;color:var(--ds-green);}
+.insight-row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--ds-border);font-size:12px;color:var(--ds-white-dim);}
+.insight-row:last-child{border-bottom:none;}
+.insight-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.script-block{background:var(--ds-surface2);border:1px solid var(--ds-border);border-radius:var(--ds-radius);padding:1rem;margin-top:10px;}
+.script-phase{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ds-green-dim);margin-bottom:6px;}
+.script-text{font-size:13px;line-height:1.7;}
+.script-note{font-size:11px;color:var(--ds-white-faint);margin-top:7px;font-style:italic;border-top:1px solid var(--ds-border);padding-top:7px;}
+#results{display:none;}
+</style>
+</head>
+<body>
+
+<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--ds-border);">
+  <h1 style="font-size:18px;font-weight:500;color:var(--ds-green);">Land deal analyzer</h1>
+  <span style="font-size:12px;color:var(--ds-white-dim);">Vacant land wholesaling</span>
+</div>
+
+<div class="ds-card">
+  <div class="ds-section-label">Parcel details</div>
+  <div class="ds-grid-2" style="margin-bottom:10px;">
+    <div class="ds-field"><label>County / State</label><input type="text" id="county" placeholder="e.g. Maricopa, AZ"></div>
+    <div class="ds-field"><label>APN / Parcel ID</label><input type="text" id="apn" placeholder="Optional"></div>
+  </div>
+  <div class="ds-grid-3" style="margin-bottom:10px;">
+    <div class="ds-field"><label>Acreage</label><input type="number" id="acreage" placeholder="0.00" min="0" step="0.01"></div>
+    <div class="ds-field"><label>Zoning</label>
+      <select id="zoning"><option value="">Select...</option><option value="rural">Rural / Agricultural</option><option value="residential">Residential</option><option value="recreational">Recreational</option><option value="commercial">Commercial</option><option value="industrial">Industrial</option><option value="infill">Urban Infill</option></select>
+    </div>
+    <div class="ds-field"><label>Road access</label>
+      <select id="access"><option value="paved">Paved road</option><option value="dirt">Dirt / gravel</option><option value="easement">Easement only</option><option value="none">No legal access</option></select>
+    </div>
+  </div>
+  <div class="ds-grid-4">
+    <div class="ds-field"><label>Utilities</label><select id="utilities"><option value="full">All utilities</option><option value="partial">Partial</option><option value="none">None</option></select></div>
+    <div class="ds-field"><label>Terrain</label><select id="terrain"><option value="flat">Flat / level</option><option value="rolling">Rolling</option><option value="hilly">Hilly</option><option value="mountainous">Mountainous</option></select></div>
+    <div class="ds-field"><label>Flood zone</label><select id="flood"><option value="no">No</option><option value="partial">Partially</option><option value="yes">Yes</option></select></div>
+    <div class="ds-field"><label>HOA / POA</label><select id="hoa"><option value="no">No</option><option value="yes">Yes</option></select></div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-section-label">Seller info</div>
+  <div class="ds-grid-2" style="margin-bottom:10px;">
+    <div class="ds-field"><label>Seller name</label><input type="text" id="sellerName" placeholder="Optional"></div>
+    <div class="ds-field"><label>Reason for sale</label>
+      <select id="saleReason"><option value="">Select...</option><option value="inherited">Inherited / estate</option><option value="taxes">Can't afford taxes</option><option value="divorce">Divorce / separation</option><option value="relocation">Moving / relocating</option><option value="financial">Financial hardship</option><option value="unused">Land sitting unused</option><option value="retirement">Retirement / downsizing</option><option value="investment">Liquidating investment</option><option value="other">Other</option></select>
+    </div>
+  </div>
+  <div class="ds-field"><label>Seller notes</label><textarea id="sellerNotes" placeholder="Motivation, timeline, personality, anything useful..."></textarea></div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-section-label">Pricing inputs</div>
+  <div class="ds-grid-3" style="margin-bottom:10px;">
+    <div class="ds-field"><label>Asking price ($)</label><input type="number" id="askingPrice" placeholder="0" min="0"></div>
+    <div class="ds-field"><label>Your target buy price ($)</label><input type="number" id="buyPrice" placeholder="0" min="0"></div>
+    <div class="ds-field"><label>Back taxes / liens ($)</label><input type="number" id="backTaxes" placeholder="0" min="0" value="0"></div>
+  </div>
+  <div class="ds-grid-2">
+    <div class="ds-field"><label>Est. closing costs ($)</label><input type="number" id="closingCosts" value="500" min="0"></div>
+    <div class="ds-field"><label>Holding costs / mo ($)</label><input type="number" id="holdingCosts" value="0" min="0"></div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-section-label">Comparable sales</div>
+  <div class="comp-header"><span>Address / description</span><span>Acres</span><span>Sale price</span><span>Date</span><span></span></div>
+  <div id="compsContainer"></div>
+  <button class="btn-add-comp" onclick="addComp()">+ Add comp</button>
+</div>
+
+<div class="ds-card">
+  <div class="ds-section-label">Exit strategy</div>
+  <div class="ds-grid-3">
+    <div class="ds-field"><label>Strategy</label>
+      <select id="exitStrategy"><option value="wholesale">Wholesale / assign</option><option value="retail">Retail list (MLS)</option><option value="owner_finance">Owner finance</option><option value="subdivide">Subdivide &amp; sell</option></select>
+    </div>
+    <div class="ds-field"><label>Target wholesale fee ($)</label><input type="number" id="wholesaleFee" placeholder="e.g. 5000" min="0"></div>
+    <div class="ds-field"><label>Months to sell</label><input type="number" id="monthsToSell" value="3" min="0"></div>
+  </div>
+</div>
+
+<button class="btn-analyze" onclick="analyze()">Analyze deal + generate negotiation script</button>
+
+<div id="results">
+  <hr style="border:none;border-top:1px solid var(--ds-border);margin:20px 0;">
+
+  <div class="ds-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="ds-section-label" style="margin:0;">Deal rating</div>
+      <span class="badge" id="ratingBadge"></span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+      <span style="font-size:38px;font-weight:500;color:var(--ds-green);" id="ratingScore"></span>
+      <span style="font-size:13px;color:var(--ds-white-dim);">/ 100</span>
+    </div>
+    <div class="ds-rating-wrap"><div class="ds-rating-bar" id="ratingBar"></div></div>
+    <div style="font-size:12px;color:var(--ds-white-faint);margin-top:4px;" id="ratingLabel"></div>
+  </div>
+
+  <div class="ds-grid-4" style="margin-bottom:14px;">
+    <div class="ds-metric"><div class="ds-metric-label">Estimated ARV</div><div class="ds-metric-val" id="mARV"></div><div class="ds-metric-sub" id="mARVSub"></div></div>
+    <div class="ds-metric"><div class="ds-metric-label">Max allowable offer</div><div class="ds-metric-val" id="mMAO"></div><div class="ds-metric-sub">70% ARV − costs</div></div>
+    <div class="ds-metric"><div class="ds-metric-label">Projected profit</div><div class="ds-metric-val" id="mProfit"></div><div class="ds-metric-sub" id="mProfitSub"></div></div>
+    <div class="ds-metric"><div class="ds-metric-label">ROI</div><div class="ds-metric-val" id="mROI"></div><div class="ds-metric-sub">on total invested</div></div>
+  </div>
+
+  <div class="ds-card">
+    <div class="ds-section-label">Price recommendation</div>
+    <div id="priceRows"></div>
+  </div>
+
+  <div class="ds-card">
+    <div class="ds-section-label">Deal insights</div>
+    <div id="insightsList"></div>
+  </div>
+
+  <div class="ds-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="ds-section-label" style="margin:0;">Negotiation script</div>
+      <span style="display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:8px;background:rgba(126,200,160,0.12);color:var(--ds-green);" id="motivationTag"></span>
+    </div>
+    <div id="scriptContent"></div>
+  </div>
+</div>
+
+<script>
+let comps=[];
+function addComp(addr='',acres='',price='',date=''){
+  const id=Date.now()+Math.random();comps.push(id);
+  const row=document.createElement('div');row.className='comp-row';row.id='comp-'+id;
+  row.innerHTML=`<input type="text" placeholder="Address or description" value="${addr}"><input type="number" placeholder="Acres" min="0" step="0.01" value="${acres}"><input type="number" placeholder="Price $" min="0" value="${price}"><input type="month" value="${date}" style="font-size:11px;"><button class="btn-del" onclick="removeComp('${id}')">×</button>`;
+  document.getElementById('compsContainer').appendChild(row);
+}
+function removeComp(id){comps=comps.filter(c=>c!=id);document.getElementById('comp-'+id)?.remove();}
+function getCompData(){
+  return comps.map(id=>{const row=document.getElementById('comp-'+id);if(!row)return null;const inp=row.querySelectorAll('input');return{acres:parseFloat(inp[1].value)||0,price:parseFloat(inp[2].value)||0};}).filter(c=>c&&c.price>0&&c.acres>0);
+}
+function fmt(n){return'$'+Math.round(n).toLocaleString();}
+function fmtPct(n){return(n>=0?'+':'')+n.toFixed(1)+'%';}
+const reasonLabels={inherited:'Inherited / estate',taxes:'Tax burden',divorce:'Divorce / separation',relocation:'Relocation',financial:'Financial hardship',unused:'Unused land',retirement:'Retirement',investment:'Liquidating investment',other:'Motivated seller','':`General`};
+function buildScript(d){
+  const name=d.sellerName||'there',first=name.split(' ')[0],prop=d.acreage?`${d.acreage}-acre parcel`:'property';
+  const offerStr=d.buyTarget>0||d.mao>0?fmt(d.buyTarget||d.mao):'a number that works for both of us',r=d.reason||'';
+  const openers={inherited:`Hi ${first}, thanks for taking my call. I understand this land came through the family — those situations can be a lot to navigate.`,taxes:`Hi ${first}, I know carrying property taxes on land you're not using really adds up. Let's see if we can sort this quickly.`,divorce:`Hi ${first}, I'll keep this simple — I know you've got a lot going on right now.`,relocation:`Hi ${first}, when you're in the middle of a move the last thing you want is a property dragging things out.`,financial:`Hi ${first}, I'm a cash buyer and I can move fast. No banks, no delays.`,unused:`Hi ${first}, you mentioned the land has just been sitting there — I hear that a lot.`,retirement:`Hi ${first}, I know when you're simplifying your life you want things to move smoothly.`,investment:`Hi ${first}, I can move quickly with cash and handle all the paperwork.`,other:`Hi ${first}, thanks for taking my call. I'm a cash land buyer in ${d.county||'your area'}.`,'':`Hi ${first}, I'm a cash land buyer working in ${d.county||'your area'}.`};
+  const pivots={inherited:`No listing, no waiting, no realtor commissions — I make a straightforward cash offer and we close on your timeline.`,taxes:`I'll handle the back taxes as part of the deal — you walk away clean.`,divorce:`I buy as-is, all cash, close in two to three weeks. One less thing to negotiate.`,relocation:`I can work around your moving timeline. You pick the date.`,financial:`I'm here to find a number that makes sense and get this done. Cash, fast, no contingencies.`,unused:`Land that's sitting just generates tax bills. I can turn that into cash within the month.`,retirement:`I'll handle the title, the closing, all of it. You just sign.`,investment:`Written offer, local title company, funds at closing. Clean and professional.`,other:`Cash, close fast, no listing, no showings, no commissions.`,'':`Cash, close fast, no listing, no showings, no commissions.`};
+  const offers={inherited:`Based on comparable parcels in the area, I'm prepared to offer ${offerStr} for the ${prop}. All cash, as-is, closing costs covered.`,taxes:`I'm at ${offerStr} — cash, and I'll handle any back taxes in the transaction.`,divorce:`I can offer ${offerStr}, all cash, close in two to three weeks — or longer if needed.`,relocation:`I'm at ${offerStr}, all cash. Pick the closing date that lines up with your move.`,financial:`Fair offer — ${offerStr}, cash, close in as little as three weeks.`,unused:`I can put ${offerStr} in your hands within a few weeks. Simple transaction.`,retirement:`My offer is ${offerStr} — cash, handled by my team.`,investment:`I'm prepared to offer ${offerStr}. Proof of funds available, agreement today if you want.`,other:`After reviewing the comps, I'd like to offer ${offerStr} — all cash, flexible closing.`,'':`After reviewing the comps, I'd like to offer ${offerStr} — all cash, flexible closing.`};
+  const objection=`If they say too low: "I hear you. But by the time you factor in realtor fees, time on market, and carrying costs, my net-to-you is competitive. What number were you hoping for? Tell me and I'll tell you honestly if I can get there."`;
+  const noteHint=d.notes?`\n\nFrom your notes: "${d.notes.slice(0,100)}${d.notes.length>100?'...':''}" — weave this into your tone.`:'';
+  return[
+    {phase:'Opening — build rapport',text:openers[r]||openers['']},
+    {phase:'Bridge — establish your value',text:pivots[r]||pivots['']},
+    {phase:'The offer',text:offers[r]||offers['']},
+    {phase:'Handling pushback',text:objection,note:'Use if they object to price.'},
+    {phase:'Close',text:`"If this works, I can have a purchase agreement to you by end of day. All I need is a yes — I handle everything from there. Does that sound fair?"${noteHint}`}
+  ];
+}
+function analyze(){
+  const acreage=parseFloat(document.getElementById('acreage').value)||0;
+  const asking=parseFloat(document.getElementById('askingPrice').value)||0;
+  const buyPrice=parseFloat(document.getElementById('buyPrice').value)||0;
+  const backTaxes=parseFloat(document.getElementById('backTaxes').value)||0;
+  const closing=parseFloat(document.getElementById('closingCosts').value)||0;
+  const holding=parseFloat(document.getElementById('holdingCosts').value)||0;
+  const months=parseFloat(document.getElementById('monthsToSell').value)||3;
+  const wholesaleFee=parseFloat(document.getElementById('wholesaleFee').value)||0;
+  const access=document.getElementById('access').value;
+  const flood=document.getElementById('flood').value;
+  const utilities=document.getElementById('utilities').value;
+  const terrain=document.getElementById('terrain').value;
+  const hoa=document.getElementById('hoa').value;
+  const exit=document.getElementById('exitStrategy').value;
+  const county=document.getElementById('county').value;
+  const sellerName=document.getElementById('sellerName').value.trim();
+  const saleReason=document.getElementById('saleReason').value;
+  const sellerNotes=document.getElementById('sellerNotes').value.trim();
+  const compData=getCompData();
+  let arv=0,arvPerAcre=0;
+  if(compData.length>0&&acreage>0){const ppa=compData.map(c=>c.price/c.acres);arvPerAcre=ppa.reduce((a,b)=>a+b,0)/ppa.length;arv=arvPerAcre*acreage;}
+  const totalCosts=backTaxes+closing+(holding*months);
+  const effectiveBuy=(buyPrice||asking)+totalCosts;
+  const mao=arv*0.70-totalCosts;
+  const price=buyPrice||asking;
+  let listPrice=0,profit=0;
+  if(exit==='wholesale'){listPrice=price+wholesaleFee;profit=wholesaleFee-totalCosts;}
+  else if(exit==='retail'){listPrice=arv>0?arv*0.95:price*1.4;profit=listPrice-effectiveBuy;}
+  else if(exit==='owner_finance'){listPrice=arv>0?arv*1.1:price*1.5;profit=listPrice*0.15;}
+  else if(exit==='subdivide'){listPrice=arv>0?arv*1.3:price*1.7;profit=listPrice-effectiveBuy-(arv*0.05);}
+  const roi=effectiveBuy>0?((profit/effectiveBuy)*100):0;
+  let score=50;
+  const spread=arv>0?((arv-effectiveBuy)/arv)*100:0;
+  if(spread>40)score+=20;else if(spread>25)score+=12;else if(spread>10)score+=4;else if(spread<0)score-=20;
+  if(asking>0&&arv>0&&asking<=mao)score+=10;else if(asking>0&&arv>0&&asking>arv*0.85)score-=15;
+  if(access==='paved')score+=8;else if(access==='dirt')score+=3;else if(access==='easement')score-=5;else if(access==='none')score-=18;
+  if(flood==='yes')score-=15;else if(flood==='partial')score-=6;
+  if(utilities==='full')score+=7;else if(utilities==='none')score-=4;
+  if(terrain==='flat')score+=5;else if(terrain==='mountainous')score-=3;
+  if(hoa==='yes')score-=3;
+  if(compData.length>=3)score+=5;else if(compData.length===0)score-=10;
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  const isGood=score>=80,isMid=score>=60;
+  document.getElementById('ratingScore').textContent=score;
+  document.getElementById('ratingBadge').textContent=isGood?'Strong deal':isMid?'Decent deal':score>=40?'Marginal deal':'Weak deal';
+  document.getElementById('ratingBadge').className='badge '+(isGood?'badge-ok':isMid?'badge-warn':'badge-bad');
+  const barColor=isGood?'#7ec8a0':isMid?'#d4a64a':'#e07070';
+  document.getElementById('ratingBar').style.cssText=`width:${score}%;background:${barColor};`;
+  document.getElementById('ratingLabel').textContent=isGood?'Checks most boxes — pursue aggressively.':isMid?'Viable with some risk — negotiate hard.':score>=40?'Proceed cautiously — several red flags.':'High risk. Pass or renegotiate significantly.';
+  document.getElementById('mARV').textContent=arv>0?fmt(arv):'—';
+  document.getElementById('mARVSub').textContent=arvPerAcre>0?fmt(arvPerAcre)+'/acre avg':'Add comps';
+  document.getElementById('mMAO').textContent=mao>0?fmt(mao):'—';
+  document.getElementById('mProfit').textContent=fmt(profit);
+  document.getElementById('mProfitSub').textContent=exit==='wholesale'?'Assignment fee':'After all costs';
+  document.getElementById('mROI').textContent=fmtPct(roi);
+  const prRows=[['Estimated ARV',arv>0?fmt(arv):'N/A — add comps',false],['Max allowable offer (MAO)',mao>0?fmt(mao):'—',false],['Total acquisition costs',fmt(totalCosts),false],['Recommended list / assign price',fmt(listPrice),true],['Projected profit',fmt(profit),true]];
+  document.getElementById('priceRows').innerHTML=prRows.map(([k,v,big])=>`<div class="price-row"><span class="price-key">${k}</span><span class="price-val${big?' big':''}">${v}</span></div>`).join('');
+  const insights=[];
+  if(arv>0&&asking>0){const disc=((arv-asking)/arv)*100;if(disc>30)insights.push({c:'#7ec8a0',t:`Asking is ${disc.toFixed(0)}% below ARV — strong discount.`});else if(disc>10)insights.push({c:'#d4a64a',t:`Asking is ${disc.toFixed(0)}% below ARV — moderate spread.`});else if(disc<0)insights.push({c:'#e07070',t:`Asking exceeds ARV by ${Math.abs(disc).toFixed(0)}% — overpriced.`});}
+  if(asking>0&&mao>0){if(asking<=mao)insights.push({c:'#7ec8a0',t:`Asking (${fmt(asking)}) ≤ MAO (${fmt(mao)}) — deal math works.`});else insights.push({c:'#e07070',t:`Asking (${fmt(asking)}) exceeds MAO by ${fmt(asking-mao)} — must negotiate down.`});}
+  if(access==='none')insights.push({c:'#e07070',t:'No legal road access — major red flag.'});
+  else if(access==='easement')insights.push({c:'#d4a64a',t:'Easement-only — verify it is recorded and transferable.'});
+  if(flood==='yes')insights.push({c:'#e07070',t:'Flood zone — lower demand, financing challenges.'});
+  if(utilities==='none')insights.push({c:'#d4a64a',t:'No utilities — factor in cost to bring power/water.'});
+  if(compData.length<2)insights.push({c:'#d4a64a',t:'Fewer than 2 comps — ARV is unreliable.'});
+  if(hoa==='yes')insights.push({c:'#d4a64a',t:'HOA/POA — get dues and restrictions before closing.'});
+  if(insights.length===0)insights.push({c:'#7ec8a0',t:'No major red flags on current inputs.'});
+  document.getElementById('insightsList').innerHTML=insights.map(i=>`<div class="insight-row"><span class="insight-dot" style="background:${i.c};"></span><span>${i.t}</span></div>`).join('');
+  document.getElementById('motivationTag').textContent=saleReason?reasonLabels[saleReason]:'General';
+  const script=buildScript({sellerName,reason:saleReason,notes:sellerNotes,asking,buyTarget:buyPrice,arv,mao,county,acreage,score});
+  document.getElementById('scriptContent').innerHTML=script.map(s=>`<div class="script-block"><div class="script-phase">${s.phase}</div><div class="script-text">${s.text}</div>${s.note?`<div class="script-note">${s.note}</div>`:''}</div>`).join('');
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+addComp();
+</script>
+</body>
+</html>

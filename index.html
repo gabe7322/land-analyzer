@@ -63,13 +63,29 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 .script-text{font-size:13px;line-height:1.7;}
 .script-note{font-size:11px;color:var(--ds-white-faint);margin-top:7px;font-style:italic;border-top:1px solid var(--ds-border);padding-top:7px;}
 #results{display:none;}
+/* Save/load */
+.saves-bar{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.btn-save{background:transparent;border:1px solid var(--ds-border-md);border-radius:var(--ds-radius);color:var(--ds-green);font-size:12px;font-family:inherit;cursor:pointer;padding:6px 14px;white-space:nowrap;}
+.btn-save:hover{background:var(--ds-surface2);}
+.saved-deals-list{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.saved-chip{display:flex;align-items:center;gap:0;background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:var(--ds-radius);overflow:hidden;font-size:12px;}
+.saved-chip-name{padding:5px 10px;cursor:pointer;color:var(--ds-white-dim);}
+.saved-chip-name:hover{color:var(--ds-white);background:var(--ds-surface2);}
+.saved-chip-del{padding:5px 8px;cursor:pointer;color:var(--ds-white-faint);border-left:1px solid var(--ds-border);background:transparent;border-top:none;border-right:none;border-bottom:none;font-size:13px;font-family:inherit;line-height:1;}
+.saved-chip-del:hover{color:var(--ds-danger);background:rgba(224,112,112,0.08);}
+.saves-empty{font-size:12px;color:var(--ds-white-faint);}
 </style>
 </head>
 <body>
 
-<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--ds-border);">
+<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--ds-border);">
   <h1 style="font-size:18px;font-weight:500;color:var(--ds-green);">Land deal analyzer</h1>
   <span style="font-size:12px;color:var(--ds-white-dim);">Vacant land wholesaling</span>
+</div>
+
+<div class="saves-bar">
+  <button class="btn-save" onclick="saveDeal()">Save deal</button>
+  <div class="saved-deals-list" id="savedDealsList"></div>
 </div>
 
 <div class="ds-card">
@@ -288,6 +304,119 @@ function analyze(){
   document.getElementById('results').scrollIntoView({behavior:'smooth'});
 }
 addComp();
+
+// ── Save / Load ──────────────────────────────────────────────
+const STORAGE_KEY = 'landAnalyzer_deals';
+
+function getFormState() {
+  const compRows = comps.map(id => {
+    const row = document.getElementById('comp-' + id);
+    if (!row) return null;
+    const inp = row.querySelectorAll('input');
+    return { addr: inp[0].value, acres: inp[1].value, price: inp[2].value, date: inp[3].value };
+  }).filter(Boolean);
+  return {
+    county:        document.getElementById('county').value,
+    apn:           document.getElementById('apn').value,
+    acreage:       document.getElementById('acreage').value,
+    zoning:        document.getElementById('zoning').value,
+    access:        document.getElementById('access').value,
+    utilities:     document.getElementById('utilities').value,
+    terrain:       document.getElementById('terrain').value,
+    flood:         document.getElementById('flood').value,
+    hoa:           document.getElementById('hoa').value,
+    sellerName:    document.getElementById('sellerName').value,
+    saleReason:    document.getElementById('saleReason').value,
+    sellerNotes:   document.getElementById('sellerNotes').value,
+    askingPrice:   document.getElementById('askingPrice').value,
+    buyPrice:      document.getElementById('buyPrice').value,
+    backTaxes:     document.getElementById('backTaxes').value,
+    closingCosts:  document.getElementById('closingCosts').value,
+    holdingCosts:  document.getElementById('holdingCosts').value,
+    exitStrategy:  document.getElementById('exitStrategy').value,
+    wholesaleFee:  document.getElementById('wholesaleFee').value,
+    monthsToSell:  document.getElementById('monthsToSell').value,
+    compRows,
+  };
+}
+
+function restoreFormState(state) {
+  document.getElementById('county').value       = state.county       || '';
+  document.getElementById('apn').value          = state.apn          || '';
+  document.getElementById('acreage').value      = state.acreage      || '';
+  document.getElementById('zoning').value       = state.zoning       || '';
+  document.getElementById('access').value       = state.access       || 'paved';
+  document.getElementById('utilities').value    = state.utilities    || 'full';
+  document.getElementById('terrain').value      = state.terrain      || 'flat';
+  document.getElementById('flood').value        = state.flood        || 'no';
+  document.getElementById('hoa').value          = state.hoa          || 'no';
+  document.getElementById('sellerName').value   = state.sellerName   || '';
+  document.getElementById('saleReason').value   = state.saleReason   || '';
+  document.getElementById('sellerNotes').value  = state.sellerNotes  || '';
+  document.getElementById('askingPrice').value  = state.askingPrice  || '';
+  document.getElementById('buyPrice').value     = state.buyPrice     || '';
+  document.getElementById('backTaxes').value    = state.backTaxes    || '0';
+  document.getElementById('closingCosts').value = state.closingCosts || '500';
+  document.getElementById('holdingCosts').value = state.holdingCosts || '0';
+  document.getElementById('exitStrategy').value = state.exitStrategy || 'wholesale';
+  document.getElementById('wholesaleFee').value = state.wholesaleFee || '';
+  document.getElementById('monthsToSell').value = state.monthsToSell || '3';
+  // rebuild comps
+  comps = [];
+  document.getElementById('compsContainer').innerHTML = '';
+  (state.compRows || []).forEach(c => addComp(c.addr, c.acres, c.price, c.date));
+  // hide stale results
+  document.getElementById('results').style.display = 'none';
+}
+
+function loadDeals() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function storeDeals(deals) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(deals));
+}
+
+function renderSavedDeals() {
+  const deals = loadDeals();
+  const el = document.getElementById('savedDealsList');
+  if (deals.length === 0) {
+    el.innerHTML = '<span class="saves-empty">No saved deals yet</span>';
+    return;
+  }
+  el.innerHTML = deals.map(d => `
+    <div class="saved-chip">
+      <span class="saved-chip-name" onclick="loadDeal('${d.id}')" title="Saved ${new Date(d.savedAt).toLocaleString()}">${d.name}</span>
+      <button class="saved-chip-del" onclick="deleteDeal('${d.id}')" title="Delete">×</button>
+    </div>`).join('');
+}
+
+function saveDeal() {
+  const state = getFormState();
+  const defaultName = [state.county, state.acreage ? state.acreage + ' ac' : ''].filter(Boolean).join(' — ') || 'Untitled deal';
+  const name = prompt('Name this deal:', defaultName);
+  if (name === null) return; // cancelled
+  const deals = loadDeals();
+  deals.unshift({ id: Date.now().toString(), name: name.trim() || defaultName, savedAt: Date.now(), state });
+  storeDeals(deals);
+  renderSavedDeals();
+}
+
+function loadDeal(id) {
+  const deal = loadDeals().find(d => d.id === id);
+  if (!deal) return;
+  restoreFormState(deal.state);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteDeal(id) {
+  const deals = loadDeals().filter(d => d.id !== id);
+  storeDeals(deals);
+  renderSavedDeals();
+}
+
+renderSavedDeals();
 </script>
 </body>
 </html>

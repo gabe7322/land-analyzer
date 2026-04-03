@@ -74,6 +74,18 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 .saved-chip-del{padding:5px 8px;cursor:pointer;color:var(--ds-white-faint);border-left:1px solid var(--ds-border);background:transparent;border-top:none;border-right:none;border-bottom:none;font-size:13px;font-family:inherit;line-height:1;}
 .saved-chip-del:hover{color:var(--ds-danger);background:rgba(224,112,112,0.08);}
 .saves-empty{font-size:12px;color:var(--ds-white-faint);}
+/* Wholesale tiers table */
+.tiers-table{width:100%;border-collapse:collapse;}
+.tiers-table th{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ds-white-faint);text-align:left;padding:0 10px 8px;}
+.tiers-table th:not(:first-child){text-align:right;}
+.tiers-table td{font-size:13px;padding:8px 10px;border-top:1px solid var(--ds-border);}
+.tiers-table td:not(:first-child){text-align:right;}
+.tiers-table tr.tier-current td{background:rgba(126,200,160,0.07);}
+.tiers-table tr.tier-current .tier-profit{color:var(--ds-green);font-weight:600;}
+.tiers-table tr.tier-na td{opacity:0.4;}
+.tier-profit{color:var(--ds-white-dim);}
+.tier-offer{color:var(--ds-white);}
+.tier-na-label{font-size:11px;color:var(--ds-danger);}
 </style>
 </head>
 <body>
@@ -183,6 +195,11 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
     <div id="priceRows"></div>
   </div>
 
+  <div class="ds-card" id="wholesaleTiersCard" style="display:none;">
+    <div class="ds-section-label">Wholesale offer tiers</div>
+    <div id="wholesaleTiersContent"></div>
+  </div>
+
   <div class="ds-card">
     <div class="ds-section-label">Deal insights</div>
     <div id="insightsList"></div>
@@ -286,6 +303,51 @@ function analyze(){
   document.getElementById('mROI').textContent=fmtPct(roi);
   const prRows=[['Estimated ARV',arv>0?fmt(arv):'N/A — add comps',false],['Max allowable offer (MAO)',mao>0?fmt(mao):'—',false],['Total acquisition costs',fmt(totalCosts),false],['Recommended list / assign price',fmt(listPrice),true],['Projected profit',fmt(profit),true]];
   document.getElementById('priceRows').innerHTML=prRows.map(([k,v,big])=>`<div class="price-row"><span class="price-key">${k}</span><span class="price-val${big?' big':''}">${v}</span></div>`).join('');
+
+  // Wholesale offer tiers
+  const tiersCard = document.getElementById('wholesaleTiersCard');
+  const tiersContent = document.getElementById('wholesaleTiersContent');
+  if(exit==='wholesale'){
+    tiersCard.style.display='block';
+    if(mao<=0||arv<=0){
+      tiersContent.innerHTML='<div style="font-size:12px;color:var(--ds-white-faint);">Add comparable sales to generate offer tiers.</div>';
+    } else {
+      const tiers=[1000,2500,5000,7500,10000,15000,20000];
+      // find closest tier to user's entered wholesaleFee
+      let closestIdx=0,minDist=Infinity;
+      tiers.forEach((t,i)=>{const d=Math.abs((wholesaleFee-totalCosts)-t);if(d<minDist){minDist=d;closestIdx=i;}});
+      const rows=tiers.map((targetProfit,i)=>{
+        const fee=targetProfit+totalCosts;   // gross fee needed
+        const offerToSeller=mao-fee;         // ceiling on what you pay the seller
+        const assignmentPrice=mao;           // end buyer pays MAO
+        const roi=offerToSeller>0?(targetProfit/(offerToSeller+totalCosts)*100):null;
+        const isCurrent=i===closestIdx;
+        const na=offerToSeller<=0;
+        return`<tr class="${isCurrent?'tier-current':''} ${na?'tier-na':''}">
+          <td><span class="tier-profit">${fmt(targetProfit)} profit</span></td>
+          <td>${na?'<span class="tier-na-label">not achievable</span>':fmt(offerToSeller)}</td>
+          <td>${na?'—':fmt(fee)}</td>
+          <td>${na?'—':fmt(assignmentPrice)}</td>
+          <td>${na||roi===null?'—':roi.toFixed(0)+'%'}</td>
+        </tr>`;
+      }).join('');
+      tiersContent.innerHTML=`
+        <table class="tiers-table">
+          <thead><tr>
+            <th>Net profit</th>
+            <th>Max offer to seller</th>
+            <th>Wholesale fee</th>
+            <th>Assign price</th>
+            <th>ROI</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="font-size:11px;color:var(--ds-white-faint);margin-top:10px;">Assign price = MAO. Highlighted row is closest to your entered wholesale fee.</div>`;
+    }
+  } else {
+    tiersCard.style.display='none';
+  }
+
   const insights=[];
   if(arv>0&&asking>0){const disc=((arv-asking)/arv)*100;if(disc>30)insights.push({c:'#7ec8a0',t:`Asking is ${disc.toFixed(0)}% below ARV — strong discount.`});else if(disc>10)insights.push({c:'#d4a64a',t:`Asking is ${disc.toFixed(0)}% below ARV — moderate spread.`});else if(disc<0)insights.push({c:'#e07070',t:`Asking exceeds ARV by ${Math.abs(disc).toFixed(0)}% — overpriced.`});}
   if(asking>0&&mao>0){if(asking<=mao)insights.push({c:'#7ec8a0',t:`Asking (${fmt(asking)}) ≤ MAO (${fmt(mao)}) — deal math works.`});else insights.push({c:'#e07070',t:`Asking (${fmt(asking)}) exceeds MAO by ${fmt(asking-mao)} — must negotiate down.`});}

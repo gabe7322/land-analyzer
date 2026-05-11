@@ -746,7 +746,7 @@ async function lpLookup(){
       :'Search error: '+msg,'error');
     return;
   }
-  const features=searchRes?.features||[];
+  const features=searchRes?.data?.features||searchRes?.features||[];
   if(features.length===0){lpSetPill(1,'error');lpSetStatus('No parcels found for that APN + state.','error');return;}
   lpRawData.search=searchRes;
   lpSetPill(1,'done');
@@ -800,19 +800,61 @@ async function lpRunSteps2and3(feature){
   if(!report){lpSetPill(3,'error');lpSetStatus('Comp report timed out. Property data was auto-filled successfully.','error');showLpRaw();return;}
   lpRawData.report=report;
   lpSetPill(3,'done');
-  autofillCompReport(report);
+  autofillCompReport(report.data||report);
   showLpRaw();
   lpSetStatus('Auto-fill complete. Review all fields before analyzing.','ok');
 }
 function autofillProperty(p,searchProps){
-  const loc=[p.city,p.state||searchProps.state||''].filter(Boolean).join(', ');
+  // county/state
+  const county=p.situscounty||searchProps.county||'';
+  const city=p.situscity||searchProps.city||'';
+  const state=p.situsstate||searchProps.state||'';
+  const loc=county?`${county}, ${state}`:city?`${city}, ${state}`:state;
   if(loc)document.getElementById('county').value=loc;
-  const apnVal=p.parcelnumb||searchProps.parcelnumb||'';
+  // APN
+  const apnVal=p.apn||searchProps.apn||searchProps.parcelnumb||'';
   if(apnVal)document.getElementById('apn').value=apnVal;
-  const ac=parseFloat(p.ll_gisacre||p.acreage||0);
+  // acreage
+  const ac=parseFloat(p.lotsizeacres||p.calc_acres||p.ll_gisacre||p.acreage||0);
   if(ac>0)document.getElementById('acreage').value=ac.toFixed(2);
-  const rawZ=p.usedesc||p.zoning||'';
+  // zoning
+  const rawZ=p.landusecode||p.landusecodedescription||p.usedesc||p.zoning||'';
   if(rawZ){const z=guessZoning(rawZ);if(z)document.getElementById('zoning').value=z;}
+  // road access
+  if(p.land_locked===true||p.land_locked===1){document.getElementById('access').value='none';}
+  else if(parseFloat(p.road_frontage)>0){document.getElementById('access').value='paved';}
+  // flood zone
+  const fema=parseFloat(p.fema_cover_percentage)||0;
+  if(p.fema_cover_percentage!=null){
+    if(fema>50)document.getElementById('flood').value='yes';
+    else if(fema>5)document.getElementById('flood').value='partial';
+    else document.getElementById('flood').value='no';
+  } else if((p.flfemafloodzone||'').toLowerCase().includes('not in')){
+    document.getElementById('flood').value='no';
+  }
+  // terrain from slope average
+  const slope=parseFloat(p.slope_average||0);
+  if(slope>0){
+    if(slope<5)document.getElementById('terrain').value='flat';
+    else if(slope<15)document.getElementById('terrain').value='rolling';
+    else if(slope<25)document.getElementById('terrain').value='hilly';
+    else document.getElementById('terrain').value='mountainous';
+  }
+  // auto-populate comp rows from similars
+  if(p.similars){
+    try{
+      const sims=typeof p.similars==='string'?JSON.parse(p.similars):p.similars;
+      const sold=sims.filter(s=>s.mls_status==='sold').slice(0,6);
+      if(sold.length>0){
+        comps.forEach(id=>document.getElementById('comp-'+id)?.remove());
+        comps=[];
+        sold.forEach(s=>{
+          const dateStr=s.sold_year&&s.sold_month?`${s.sold_year}-${String(s.sold_month).padStart(2,'0')}` :'';
+          addComp(s.apn||'',s.area_acres||'',s.mls_price||'',dateStr);
+        });
+      }
+    }catch(e){/* skip */}
+  }
 }
 function autofillCompReport(r){
   if(r.land_locked===true||r.land_locked===1){document.getElementById('access').value='none';}

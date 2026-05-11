@@ -125,6 +125,20 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 .offer-timeline{font-size:11px;color:var(--ds-white-dim);margin-bottom:4px;}
 .offer-terms{font-size:11px;color:var(--ds-white-faint);line-height:1.5;}
 .offer-note{font-size:11px;color:var(--ds-white-faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--ds-border);}
+/* LandPortal lookup */
+.lp-lookup-card{border-color:rgba(126,200,160,0.28)!important;margin-bottom:1.25rem;}
+.lp-jwt-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:10px;}
+.lp-lookup-row{display:flex;align-items:flex-end;gap:8px;}
+.lp-progress{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.lp-pill{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--ds-radius);background:var(--ds-surface2);border:1px solid var(--ds-border);color:var(--ds-white-faint);transition:all 0.2s;}
+.lp-pill.active{background:rgba(126,200,160,0.15);border-color:var(--ds-green-dim);color:var(--ds-green);}
+.lp-pill.done{background:rgba(126,200,160,0.08);border-color:rgba(126,200,160,0.2);color:var(--ds-green-dim);}
+.lp-pill.error{border-color:var(--ds-danger);color:var(--ds-danger);}
+.lp-pill-sep{font-size:11px;color:var(--ds-white-faint);}
+.lp-status{font-size:12px;margin-top:8px;padding:7px 10px;background:var(--ds-surface2);border-radius:var(--ds-radius);border:1px solid var(--ds-border);}
+.lp-picker{margin-top:8px;}
+.lp-picker select{background:var(--ds-surface2);border:1px solid var(--ds-border-md);border-radius:var(--ds-radius);color:var(--ds-white);font-family:inherit;font-size:13px;padding:6px 10px;width:100%;outline:none;cursor:pointer;}
+.lp-estimates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
 /* Tab bar */
 .tab-bar{display:flex;margin-bottom:1.25rem;border-bottom:1px solid var(--ds-border);}
 .tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ds-white-dim);font-size:13px;font-family:inherit;cursor:pointer;padding:10px 22px;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;}
@@ -161,6 +175,44 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 </div>
 
 <div id="analyzerView">
+
+<div class="ds-card lp-lookup-card">
+  <div class="ds-section-label" style="margin-bottom:10px;">LandPortal Auto-Fill</div>
+  <div class="lp-jwt-row">
+    <div class="ds-field" style="flex:1;">
+      <label>JWT Token</label>
+      <input type="password" id="lpJwt" placeholder="Paste your LandPortal JWT token…">
+    </div>
+    <button class="btn-save" onclick="saveLpJwt()">Save token</button>
+    <span id="lpJwtStatus" class="badge" style="display:none;align-self:center;"></span>
+  </div>
+  <div class="lp-lookup-row">
+    <div class="ds-field" style="flex:1;">
+      <label>APN / Parcel ID</label>
+      <input type="text" id="lpApn" placeholder="e.g. 0345-123-456-0000">
+    </div>
+    <div class="ds-field" style="width:72px;">
+      <label>State</label>
+      <input type="text" id="lpState" placeholder="FL" maxlength="2" style="text-transform:uppercase;">
+    </div>
+    <button class="btn-save" style="align-self:flex-end;padding:7px 18px;white-space:nowrap;" onclick="lpLookup()">Look up →</button>
+  </div>
+  <div id="lpProgress" class="lp-progress" style="display:none;">
+    <span id="lpPill1" class="lp-pill">1 · Search</span>
+    <span class="lp-pill-sep">→</span>
+    <span id="lpPill2" class="lp-pill">2 · Property data</span>
+    <span class="lp-pill-sep">→</span>
+    <span id="lpPill3" class="lp-pill">3 · Comp report</span>
+  </div>
+  <div id="lpStatus" class="lp-status" style="display:none;"></div>
+  <div id="lpResultsPicker" class="lp-picker" style="display:none;"></div>
+  <div id="lpEstimates" class="lp-estimates-grid" style="display:none;"></div>
+  <div id="lpRawWrap" style="display:none;">
+    <button class="btn-save" onclick="toggleLpRaw()" style="margin-top:8px;font-size:11px;">Toggle raw API data</button>
+    <pre id="lpRaw" style="display:none;font-size:10px;color:var(--ds-white-faint);overflow:auto;max-height:220px;margin-top:8px;background:var(--ds-surface2);padding:10px;border-radius:8px;border:1px solid var(--ds-border);white-space:pre-wrap;word-break:break-all;"></pre>
+  </div>
+</div>
+
 <div class="prop-type-toggle">
   <button id="togPlatted" class="prop-type-btn active" onclick="setPropType('platted')">Platted Infill Lot</button>
   <button id="togRural" class="prop-type-btn" onclick="setPropType('rural')">Rural Acreage</button>
@@ -661,6 +713,170 @@ function analyze(){
 }
 addComp();
 
+// ── LandPortal API ───────────────────────────────────────────
+const LP_BASE='https://landportal.com/wp-json/lp-rest-api/v1';
+let lpRawData={};
+
+function getLpJwt(){return localStorage.getItem('lp_jwt')||'';}
+function saveLpJwt(){
+  const v=document.getElementById('lpJwt').value.trim();
+  if(!v)return;
+  localStorage.setItem('lp_jwt',v);
+  document.getElementById('lpJwt').value='';
+  updateLpJwtStatus();
+}
+function updateLpJwtStatus(){
+  const jwt=getLpJwt();
+  const el=document.getElementById('lpJwtStatus');
+  if(jwt){el.textContent='Token saved';el.className='badge badge-ok';el.style.display='inline-block';}
+  else{el.style.display='none';}
+}
+function lpSetStatus(msg,type='info'){
+  const el=document.getElementById('lpStatus');
+  el.style.display='block';
+  el.textContent=msg;
+  el.style.color=type==='error'?'var(--ds-danger)':type==='ok'?'var(--ds-green)':'var(--ds-white-dim)';
+}
+function lpSetPill(step,state){
+  const el=document.getElementById('lpPill'+step);
+  if(!el)return;
+  el.className='lp-pill'+(state==='active'?' active':state==='done'?' done':state==='error'?' error':'');
+}
+function lpFetch(url,opts={}){
+  return fetch(url,{...opts,headers:{'Authorization':'Bearer '+getLpJwt(),'Content-Type':'application/json',...(opts.headers||{})}});
+}
+async function lpLookup(){
+  const apn=document.getElementById('lpApn').value.trim();
+  const state=document.getElementById('lpState').value.trim().toUpperCase();
+  if(!apn||!state){lpSetStatus('Enter APN and state first.','error');return;}
+  if(!getLpJwt()){lpSetStatus('Paste and save your LandPortal JWT token first.','error');return;}
+  document.getElementById('lpProgress').style.display='flex';
+  document.getElementById('lpResultsPicker').style.display='none';
+  document.getElementById('lpEstimates').style.display='none';
+  document.getElementById('lpRawWrap').style.display='none';
+  lpRawData={};
+  lpSetPill(1,'active');lpSetPill(2,'idle');lpSetPill(3,'idle');
+  lpSetStatus('Searching parcel…');
+  let searchRes;
+  try{
+    const r=await lpFetch(`${LP_BASE}/search?type=parcelnumb&query=${encodeURIComponent(apn)}&state=${state}`);
+    if(!r.ok){lpSetPill(1,'error');lpSetStatus('Search failed — HTTP '+r.status+'. Check your JWT token.','error');return;}
+    searchRes=await r.json();
+  }catch(e){
+    lpSetPill(1,'error');
+    const msg=e.message||'';
+    lpSetStatus(msg.toLowerCase().includes('cors')||msg.toLowerCase().includes('fetch')
+      ?'CORS error — LandPortal blocked the browser request. A thin proxy (Cloudflare Worker or Express) is required. See CLAUDE_1apilandportalupdate.md.'
+      :'Search error: '+msg,'error');
+    return;
+  }
+  const features=searchRes?.features||[];
+  if(features.length===0){lpSetPill(1,'error');lpSetStatus('No parcels found for that APN + state.','error');return;}
+  lpRawData.search=searchRes;
+  lpSetPill(1,'done');
+  if(features.length===1){
+    await lpRunSteps2and3(features[0]);
+  }else{
+    lpSetStatus(features.length+' parcels found — select one below.','info');
+    const picker=document.getElementById('lpResultsPicker');
+    picker.style.display='block';
+    picker.innerHTML=`<select onchange="lpPickerChoose(this.value,window._lpSearchFeatures)"><option value="">Choose a parcel…</option>${features.map((f,i)=>`<option value="${i}">${f.properties.parcelnumb||f.properties.propertyid} — ${f.properties.address||''}</option>`).join('')}</select>`;
+    window._lpSearchFeatures=features;
+  }
+}
+async function lpPickerChoose(idx,features){
+  if(idx==='')return;
+  document.getElementById('lpResultsPicker').style.display='none';
+  await lpRunSteps2and3(features[parseInt(idx)]);
+}
+async function lpRunSteps2and3(feature){
+  const props=feature.properties;
+  const propertyid=props.propertyid;
+  const fips=props.fips;
+  // Step 2 — Property data
+  lpSetPill(2,'active');
+  lpSetStatus('Fetching property data…');
+  let propData;
+  try{
+    const r=await lpFetch(`${LP_BASE}/property-data?propertyid=${propertyid}&fips=${fips}`);
+    if(!r.ok){lpSetPill(2,'error');lpSetStatus('Property data failed — HTTP '+r.status,'error');return;}
+    propData=await r.json();
+  }catch(e){lpSetPill(2,'error');lpSetStatus('Property data error: '+e.message,'error');return;}
+  lpRawData.property=propData;
+  lpSetPill(2,'done');
+  autofillProperty(propData?.data?.property||{},props);
+  // Step 3 — Comp report
+  lpSetPill(3,'active');
+  lpSetStatus('Requesting comp report (may take ~20s)…');
+  try{
+    const postR=await lpFetch(`${LP_BASE}/reports`,{method:'POST',body:JSON.stringify({propertyid,fips})});
+    if(!postR.ok&&postR.status!==202){lpSetPill(3,'error');lpSetStatus('Comp report request failed — HTTP '+postR.status,'error');showLpRaw();return;}
+  }catch(e){lpSetPill(3,'error');lpSetStatus('Comp report error: '+e.message,'error');return;}
+  let report=null;
+  for(let i=0;i<15;i++){
+    await new Promise(res=>setTimeout(res,2500));
+    lpSetStatus(`Waiting for comp report… (${i+1}/15)`);
+    try{
+      const getR=await lpFetch(`${LP_BASE}/reports?propertyid=${propertyid}&fips=${fips}`);
+      if(getR.ok){const d=await getR.json();if(d&&!(d.message||'').toLowerCase().includes('not found')){report=d;break;}}
+    }catch(e){/* keep polling */}
+  }
+  if(!report){lpSetPill(3,'error');lpSetStatus('Comp report timed out. Property data was auto-filled successfully.','error');showLpRaw();return;}
+  lpRawData.report=report;
+  lpSetPill(3,'done');
+  autofillCompReport(report);
+  showLpRaw();
+  lpSetStatus('Auto-fill complete. Review all fields before analyzing.','ok');
+}
+function autofillProperty(p,searchProps){
+  const loc=[p.city,p.state||searchProps.state||''].filter(Boolean).join(', ');
+  if(loc)document.getElementById('county').value=loc;
+  const apnVal=p.parcelnumb||searchProps.parcelnumb||'';
+  if(apnVal)document.getElementById('apn').value=apnVal;
+  const ac=parseFloat(p.ll_gisacre||p.acreage||0);
+  if(ac>0)document.getElementById('acreage').value=ac.toFixed(2);
+  const rawZ=p.usedesc||p.zoning||'';
+  if(rawZ){const z=guessZoning(rawZ);if(z)document.getElementById('zoning').value=z;}
+}
+function autofillCompReport(r){
+  if(r.land_locked===true||r.land_locked===1){document.getElementById('access').value='none';}
+  else if(parseFloat(r.road_frontage)>0){document.getElementById('access').value='paved';}
+  const fema=parseFloat(r.fema_cover_percentage)||0;
+  if(fema>50)document.getElementById('flood').value='yes';
+  else if(fema>5)document.getElementById('flood').value='partial';
+  else if(r.fema_cover_percentage!=null)document.getElementById('flood').value='no';
+  const sz=parseFloat(r.size||0);
+  if(sz>0&&!document.getElementById('acreage').value)document.getElementById('acreage').value=sz.toFixed(2);
+  const metrics=[
+    ['LP Est. Value',r.total_our_estimation_values_base?'$'+Math.round(r.total_our_estimation_values_base).toLocaleString():'—'],
+    ['LP $/acre',r.price_acre_our_estimation_values_base?'$'+Math.round(r.price_acre_our_estimation_values_base).toLocaleString():'—'],
+    ['Mean $/acre',r.price_acre_mean?'$'+Math.round(r.price_acre_mean).toLocaleString():'—'],
+    ['County avg $/acre',r.price_acre_county?'$'+Math.round(r.price_acre_county).toLocaleString():'—'],
+    ['Road frontage',r.road_frontage?r.road_frontage+' ft':'—'],
+    ['Wetlands cover',r.wetlands_cover_percentage!=null?r.wetlands_cover_percentage+'%':'—'],
+  ];
+  const estEl=document.getElementById('lpEstimates');
+  estEl.innerHTML=metrics.map(([l,v])=>`<div class="ds-metric"><div class="ds-metric-label">${l}</div><div class="ds-metric-val" style="font-size:15px;">${v}</div></div>`).join('');
+  if(r.link)estEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:4px;"><a href="${r.link}" target="_blank" style="font-size:12px;color:var(--ds-green);">View on LandPortal →</a></div>`;
+  estEl.style.display='grid';
+  updateFlChecks();
+}
+function guessZoning(raw){
+  const r=raw.toLowerCase();
+  if(r.includes('agri')||r.includes('rural')||r.includes('farm')||r.includes('vacl')||r.includes('vacant land'))return 'rural';
+  if(r.includes('comm')||r.includes('retail')||r.includes('office'))return 'commercial';
+  if(r.includes('ind')||r.includes('manuf')||r.includes('warehouse'))return 'industrial';
+  if(r.includes('rec')||r.includes('park')||r.includes('open space'))return 'recreational';
+  if(r.includes('infill')||r.includes('urban'))return 'infill';
+  if(r.includes('res')||r.includes('single')||r.includes('multi'))return 'residential';
+  return '';
+}
+function toggleLpRaw(){const el=document.getElementById('lpRaw');el.style.display=el.style.display==='none'?'block':'none';}
+function showLpRaw(){
+  document.getElementById('lpRawWrap').style.display='block';
+  document.getElementById('lpRaw').textContent=JSON.stringify(lpRawData,null,2);
+}
+
 // ── Save / Load ──────────────────────────────────────────────
 const STORAGE_KEY = 'landAnalyzer_deals';
 
@@ -962,6 +1178,7 @@ function clearDD(){
 
 renderSavedDeals();
 renderDDChecklist();
+updateLpJwtStatus();
 </script>
 </body>
 </html>

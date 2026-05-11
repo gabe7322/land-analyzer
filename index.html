@@ -706,11 +706,8 @@ function analyze(){
 addComp();
 
 // ── LandPortal API ───────────────────────────────────────────
-// ← paste your Cloudflare Worker URL here after deploying proxy/worker.js
-const LP_PROXY='https://lp-proxy.YOUR-SUBDOMAIN.workers.dev';
+const LP_PROXY='https://gclpjwt.gabeconway5.workers.dev';
 let lpRawData={};
-
-function lpProxyReady(){return!LP_PROXY.includes('YOUR-SUBDOMAIN');}
 function lpSetStatus(msg,type='info'){
   const el=document.getElementById('lpStatus');
   el.style.display='block';
@@ -729,7 +726,6 @@ async function lpLookup(){
   const apn=document.getElementById('lpApn').value.trim();
   const state=document.getElementById('lpState').value.trim().toUpperCase();
   if(!apn||!state){lpSetStatus('Enter APN and state first.','error');return;}
-  if(!lpProxyReady()){lpSetStatus('Proxy not configured — paste your Cloudflare Worker URL into LP_PROXY in index.html.','error');return;}
   document.getElementById('lpProgress').style.display='flex';
   document.getElementById('lpResultsPicker').style.display='none';
   document.getElementById('lpEstimates').style.display='none';

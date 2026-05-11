@@ -86,6 +86,60 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 .tier-profit{color:var(--ds-white-dim);}
 .tier-offer{color:var(--ds-white);}
 .tier-na-label{font-size:11px;color:var(--ds-danger);}
+/* Property type toggle */
+.prop-type-toggle{display:flex;background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:var(--ds-radius);overflow:hidden;margin-bottom:1.25rem;width:fit-content;}
+.prop-type-btn{background:transparent;border:none;color:var(--ds-white-dim);font-size:13px;font-family:inherit;cursor:pointer;padding:8px 22px;transition:background 0.15s,color 0.15s;}
+.prop-type-btn.active{background:var(--ds-green);color:#0d1b2a;font-weight:600;}
+.prop-type-btn:not(.active):hover{background:var(--ds-surface2);color:var(--ds-white);}
+.comp-metric-hint{font-size:11px;color:var(--ds-white-faint);margin-bottom:10px;font-style:italic;}
+/* HOA comp section */
+.hoa-comp-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--ds-border);}
+.hoa-comp-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ds-warn);cursor:pointer;margin-bottom:8px;}
+.hoa-comp-row input[type="checkbox"]{accent-color:var(--ds-warn);width:14px;height:14px;cursor:pointer;}
+.hoa-discount-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ds-white-dim);}
+.hoa-discount-row input{width:52px;height:28px;text-align:center;padding:0 6px;}
+/* FL checks */
+.fl-checks-card{border-color:rgba(212,166,74,0.35)!important;}
+.fl-check-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ds-white-dim);padding:6px 0;cursor:pointer;line-height:1.5;}
+.fl-check-row input[type="checkbox"]{accent-color:var(--ds-green);width:14px;height:14px;flex-shrink:0;margin-top:2px;cursor:pointer;}
+.fl-check-row a{color:var(--ds-green);text-decoration:none;}
+.fl-check-row a:hover{color:var(--ds-green-hi);}
+.fl-sinkhole-warning{font-size:11px;color:var(--ds-warn);margin-top:8px;padding:8px 10px;background:rgba(212,166,74,0.07);border-radius:6px;border:1px solid rgba(212,166,74,0.2);}
+.mao-blocked{font-size:12px;color:var(--ds-warn);margin-top:4px;}
+/* Three-offer output */
+.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.offer-card{background:var(--ds-surface2);border:1px solid var(--ds-border);border-radius:var(--ds-radius);padding:14px 16px;}
+.offer-card.offer-a{border-color:var(--ds-border-md);}
+.offer-letter{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;margin-bottom:8px;}
+.offer-a .offer-letter{background:rgba(126,200,160,0.18);color:var(--ds-green);}
+.offer-b .offer-letter{background:rgba(240,244,248,0.08);color:var(--ds-white-dim);}
+.offer-c .offer-letter{background:rgba(240,244,248,0.08);color:var(--ds-white-dim);}
+.offer-title{font-size:11px;font-weight:500;color:var(--ds-white);margin-bottom:10px;}
+.offer-price{font-size:22px;font-weight:500;color:var(--ds-green);margin-bottom:6px;}
+.offer-timeline{font-size:11px;color:var(--ds-white-dim);margin-bottom:4px;}
+.offer-terms{font-size:11px;color:var(--ds-white-faint);line-height:1.5;}
+.offer-note{font-size:11px;color:var(--ds-white-faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--ds-border);}
+/* Tab bar */
+.tab-bar{display:flex;margin-bottom:1.25rem;border-bottom:1px solid var(--ds-border);}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ds-white-dim);font-size:13px;font-family:inherit;cursor:pointer;padding:10px 22px;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;}
+.tab-btn.active{color:var(--ds-green);border-bottom-color:var(--ds-green);font-weight:500;}
+.tab-btn:hover:not(.active){color:var(--ds-white);}
+/* DD checklist */
+.dd-group-label{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ds-green-dim);margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--ds-border);}
+.dd-group-label:first-child{margin-top:0;}
+.dd-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--ds-border);cursor:pointer;font-size:12px;color:var(--ds-white-dim);line-height:1.5;}
+.dd-item:last-child{border-bottom:none;}
+.dd-item input[type="checkbox"]{accent-color:var(--ds-green);width:14px;height:14px;flex-shrink:0;margin-top:2px;cursor:pointer;}
+.dd-item.dd-critical{color:var(--ds-warn);}
+.dd-section-count{font-size:11px;color:var(--ds-white-faint);}
+.dd-killers-card{border-color:rgba(224,112,112,0.3)!important;}
+.dd-killer-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--ds-border);cursor:pointer;}
+.dd-killer-item:last-child{border-bottom:none;}
+.dd-killer-item input[type="checkbox"]{accent-color:var(--ds-danger);width:14px;height:14px;flex-shrink:0;margin-top:3px;cursor:pointer;}
+.dd-killer-label{display:block;font-size:12px;color:var(--ds-white-dim);line-height:1.5;}
+.dd-killer-action{display:block;font-size:11px;color:var(--ds-danger);margin-top:2px;font-weight:500;}
+.dd-progress-wrap{background:var(--ds-surface2);border-radius:4px;height:5px;margin:8px 0 4px;overflow:hidden;}
+.dd-progress-bar{height:100%;border-radius:4px;background:var(--ds-green);transition:width 0.4s ease;}
 </style>
 </head>
 <body>
@@ -93,6 +147,17 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--ds-border);">
   <h1 style="font-size:18px;font-weight:500;color:var(--ds-green);">Land deal analyzer</h1>
   <span style="font-size:12px;color:var(--ds-white-dim);">Vacant land wholesaling</span>
+</div>
+
+<div class="tab-bar">
+  <button id="tabAnalyzer" class="tab-btn active" onclick="setTab('analyzer')">Deal Analyzer</button>
+  <button id="tabDD" class="tab-btn" onclick="setTab('dd')">Due Diligence</button>
+</div>
+
+<div id="analyzerView">
+<div class="prop-type-toggle">
+  <button id="togPlatted" class="prop-type-btn active" onclick="setPropType('platted')">Platted Infill Lot</button>
+  <button id="togRural" class="prop-type-btn" onclick="setPropType('rural')">Rural Acreage</button>
 </div>
 
 <div class="saves-bar">
@@ -103,7 +168,7 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 <div class="ds-card">
   <div class="ds-section-label">Parcel details</div>
   <div class="ds-grid-2" style="margin-bottom:10px;">
-    <div class="ds-field"><label>County / State</label><input type="text" id="county" placeholder="e.g. Maricopa, AZ"></div>
+    <div class="ds-field"><label>County / State</label><input type="text" id="county" placeholder="e.g. Maricopa, AZ" oninput="updateFlChecks()"></div>
     <div class="ds-field"><label>APN / Parcel ID</label><input type="text" id="apn" placeholder="Optional"></div>
   </div>
   <div class="ds-grid-3" style="margin-bottom:10px;">
@@ -119,7 +184,7 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
     <div class="ds-field"><label>Utilities</label><select id="utilities"><option value="full">All utilities</option><option value="partial">Partial</option><option value="none">None</option></select></div>
     <div class="ds-field"><label>Terrain</label><select id="terrain"><option value="flat">Flat / level</option><option value="rolling">Rolling</option><option value="hilly">Hilly</option><option value="mountainous">Mountainous</option></select></div>
     <div class="ds-field"><label>Flood zone</label><select id="flood"><option value="no">No</option><option value="partial">Partially</option><option value="yes">Yes</option></select></div>
-    <div class="ds-field"><label>HOA / POA</label><select id="hoa"><option value="no">No</option><option value="yes">Yes</option></select></div>
+    <div class="ds-field"><label>HOA / POA</label><select id="hoa" onchange="updateHoaCompSection()"><option value="no">No</option><option value="yes">Yes</option></select></div>
   </div>
 </div>
 
@@ -149,20 +214,51 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 
 <div class="ds-card">
   <div class="ds-section-label">Comparable sales</div>
+  <div id="compMetricHint" class="comp-metric-hint">Platted infill — ARV uses median $/sq ft × subject lot sq ft. Use closed sales from same subdivision or within 0.25 mi. Separate HOA and non-HOA comps.</div>
   <div class="comp-header"><span>Address / description</span><span>Acres</span><span>Sale price</span><span>Date</span><span></span></div>
   <div id="compsContainer"></div>
   <button class="btn-add-comp" onclick="addComp()">+ Add comp</button>
+  <div id="hoaCompSection" class="hoa-comp-section" style="display:none;">
+    <label class="hoa-comp-row">
+      <input type="checkbox" id="hoaCompsConfirmed">
+      Comps confirmed from same HOA only (non-HOA comps excluded)
+    </label>
+    <div class="hoa-discount-row">
+      <span>HOA discount factor:</span>
+      <input type="number" id="hoaDiscount" value="15" min="0" max="30" class="ds-field">
+      <span>% — applied to ARV (HOA lots typically sell 10–20% below non-HOA)</span>
+    </div>
+  </div>
 </div>
 
 <div class="ds-card">
   <div class="ds-section-label">Exit strategy</div>
   <div class="ds-grid-3">
     <div class="ds-field"><label>Strategy</label>
-      <select id="exitStrategy"><option value="wholesale">Wholesale / assign</option><option value="retail">Retail list (MLS)</option><option value="owner_finance">Owner finance</option><option value="subdivide">Subdivide &amp; sell</option></select>
+      <select id="exitStrategy">
+        <option value="wholesale">Wholesale / assign</option>
+        <option value="retail">Retail list (MLS)</option>
+        <option value="owner_finance">Owner finance</option>
+        <option value="subdivide" class="rural-only">Subdivide &amp; sell</option>
+      </select>
     </div>
     <div class="ds-field"><label>Target wholesale fee ($)</label><input type="number" id="wholesaleFee" placeholder="e.g. 5000" min="0"></div>
     <div class="ds-field"><label>Months to sell</label><input type="number" id="monthsToSell" value="3" min="0"></div>
   </div>
+</div>
+
+<div id="flChecksCard" class="ds-card fl-checks-card" style="display:none;">
+  <div class="ds-section-label" style="color:var(--ds-warn);margin-bottom:6px;">Florida DD — required before analyzing</div>
+  <div style="font-size:12px;color:var(--ds-white-dim);margin-bottom:10px;">Florida parcel detected. These two checks are mandatory — MAO will be blocked until both are confirmed clean.</div>
+  <label class="fl-check-row">
+    <input type="checkbox" id="flWetlands">
+    Wetlands check (NWI) confirmed clean — <a href="https://www.fws.gov/wetlands" target="_blank">fws.gov/wetlands</a>
+  </label>
+  <label class="fl-check-row">
+    <input type="checkbox" id="flSinkhole">
+    Sinkhole check (FDEP) confirmed clean — <a href="https://www.floridadep.gov" target="_blank">floridadep.gov</a>
+  </label>
+  <div id="flSinkholeWarning" class="fl-sinkhole-warning" style="display:none;">High sinkhole risk county (Lee, Polk, or Pasco). A sinkhole on or adjacent to the parcel blocks retail buyer financing. Check the FDEP database — not just Google Maps.</div>
 </div>
 
 <button class="btn-analyze" onclick="analyze()">Analyze deal + generate negotiation script</button>
@@ -195,6 +291,15 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
     <div id="priceRows"></div>
   </div>
 
+  <div class="ds-card" id="threeOfferCard" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+      <div class="ds-section-label" style="margin:0;">Three-offer structure</div>
+      <span style="font-size:11px;color:var(--ds-white-faint);">Present all three — let seller negotiate against themselves</span>
+    </div>
+    <div class="offer-grid" id="threeOfferGrid"></div>
+    <div class="offer-note" id="threeOfferNote"></div>
+  </div>
+
   <div class="ds-card" id="wholesaleTiersCard" style="display:none;">
     <div class="ds-section-label">Wholesale offer tiers</div>
     <div id="wholesaleTiersContent"></div>
@@ -212,9 +317,69 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
     </div>
     <div id="scriptContent"></div>
   </div>
+</div><!-- /results -->
+</div><!-- /analyzerView -->
+
+<div id="ddView" style="display:none;">
+  <div class="ds-card" style="margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="ds-section-label" style="margin:0;">Due Diligence Progress</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-save" onclick="clearDD()">Clear checklist</button>
+        <button class="btn-save" onclick="saveDeal()">Save with deal</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:var(--ds-white);" id="ddProgressText">0 / 0 items confirmed</span>
+      <span style="font-size:12px;" id="ddKillersText">No deal killers flagged</span>
+    </div>
+    <div class="dd-progress-wrap"><div class="dd-progress-bar" id="ddProgressBar" style="width:0%;"></div></div>
+  </div>
+  <div id="ddChecklist"></div>
 </div>
 
 <script>
+let propertyType='platted'; // 'platted' | 'rural'
+
+const FL_KEYWORDS=['lee','pasco','polk','osceola','marion',' fl','florida',', fl'];
+const FL_SINKHOLE_COUNTIES=['lee','pasco','polk'];
+
+function isFlCounty(){
+  const v=document.getElementById('county').value.toLowerCase();
+  return FL_KEYWORDS.some(k=>v.includes(k));
+}
+function isHighSinkholeRisk(){
+  const v=document.getElementById('county').value.toLowerCase();
+  return FL_SINKHOLE_COUNTIES.some(k=>v.includes(k));
+}
+function updateFlChecks(){
+  const show=isFlCounty();
+  document.getElementById('flChecksCard').style.display=show?'block':'none';
+  document.getElementById('flSinkholeWarning').style.display=(show&&isHighSinkholeRisk())?'block':'none';
+}
+function updateHoaCompSection(){
+  const show=document.getElementById('hoa').value==='yes'&&propertyType==='platted';
+  document.getElementById('hoaCompSection').style.display=show?'block':'none';
+}
+
+function setPropType(type){
+  propertyType=type;
+  document.getElementById('togPlatted').classList.toggle('active',type==='platted');
+  document.getElementById('togRural').classList.toggle('active',type==='rural');
+  document.getElementById('compMetricHint').textContent=type==='platted'
+    ?'Platted infill — ARV uses median $/sq ft × subject lot sq ft. Use closed sales from same subdivision or within 0.25 mi. Separate HOA and non-HOA comps.'
+    :'Rural acreage — ARV uses avg $/acre × subject acreage. Use closed sales within 1.0 mi. Verify access and utilities match subject parcel.';
+  // show/hide Subdivide option
+  const subdivideOpt=document.querySelector('#exitStrategy option[value="subdivide"]');
+  if(subdivideOpt){
+    subdivideOpt.hidden=type==='platted';
+    if(type==='platted'&&document.getElementById('exitStrategy').value==='subdivide')
+      document.getElementById('exitStrategy').value='wholesale';
+  }
+  updateHoaCompSection();
+  document.getElementById('results').style.display='none';
+}
+
 let comps=[];
 function addComp(addr='',acres='',price='',date=''){
   const id=Date.now()+Math.random();comps.push(id);
@@ -265,8 +430,29 @@ function analyze(){
   const saleReason=document.getElementById('saleReason').value;
   const sellerNotes=document.getElementById('sellerNotes').value.trim();
   const compData=getCompData();
-  let arv=0,arvPerAcre=0;
-  if(compData.length>0&&acreage>0){const ppa=compData.map(c=>c.price/c.acres);arvPerAcre=ppa.reduce((a,b)=>a+b,0)/ppa.length;arv=arvPerAcre*acreage;}
+  const sqft=acreage*43560;
+  let arv=0,arvPerAcre=0,arvPerSqft=0;
+  if(compData.length>0){
+    if(propertyType==='platted'){
+      const ppsf=compData.map(c=>c.price/(c.acres*43560)).sort((a,b)=>a-b);
+      const mid=Math.floor(ppsf.length/2);
+      arvPerSqft=ppsf.length%2!==0?ppsf[mid]:(ppsf[mid-1]+ppsf[mid])/2;
+      arvPerAcre=arvPerSqft*43560;
+      if(acreage>0)arv=arvPerSqft*sqft;
+    } else {
+      if(acreage>0){const ppa=compData.map(c=>c.price/c.acres);arvPerAcre=ppa.reduce((a,b)=>a+b,0)/ppa.length;arv=arvPerAcre*acreage;}
+    }
+  }
+  // HOA discount
+  const hoaActive=hoa==='yes'&&propertyType==='platted';
+  const hoaDiscountPct=hoaActive?(parseFloat(document.getElementById('hoaDiscount').value)||15):0;
+  const hoaCompsConfirmed=hoaActive&&document.getElementById('hoaCompsConfirmed').checked;
+  if(hoaActive&&arv>0)arv=arv*(1-hoaDiscountPct/100);
+  // FL check gate
+  const flDetected=isFlCounty();
+  const flWetlandsOk=!flDetected||document.getElementById('flWetlands').checked;
+  const flSinkholeOk=!flDetected||document.getElementById('flSinkhole').checked;
+  const flBlocked=flDetected&&(!flWetlandsOk||!flSinkholeOk);
   const totalCosts=backTaxes+closing+(holding*months);
   const effectiveBuy=(buyPrice||asking)+totalCosts;
   const mao=arv*0.70-totalCosts;
@@ -296,13 +482,60 @@ function analyze(){
   document.getElementById('ratingBar').style.cssText=`width:${score}%;background:${barColor};`;
   document.getElementById('ratingLabel').textContent=isGood?'Checks most boxes — pursue aggressively.':isMid?'Viable with some risk — negotiate hard.':score>=40?'Proceed cautiously — several red flags.':'High risk. Pass or renegotiate significantly.';
   document.getElementById('mARV').textContent=arv>0?fmt(arv):'—';
-  document.getElementById('mARVSub').textContent=arvPerAcre>0?fmt(arvPerAcre)+'/acre avg':'Add comps';
-  document.getElementById('mMAO').textContent=mao>0?fmt(mao):'—';
+  let arvSub=propertyType==='platted'
+    ?(arvPerSqft>0?'$'+arvPerSqft.toFixed(2)+'/sqft median':'Add comps')
+    :(arvPerAcre>0?fmt(arvPerAcre)+'/acre avg':'Add comps');
+  if(hoaActive&&arv>0)arvSub+=' · HOA −'+hoaDiscountPct+'% applied';
+  document.getElementById('mARVSub').textContent=arvSub;
+  const maoEl=document.getElementById('mMAO');
+  if(flBlocked){
+    maoEl.textContent='Blocked';
+    maoEl.style.color='var(--ds-warn)';
+    document.getElementById('mMAO').nextElementSibling.innerHTML='<span class="mao-blocked">Complete FL checks above</span>';
+  } else {
+    maoEl.textContent=mao>0?fmt(mao):'—';
+    maoEl.style.color='var(--ds-green)';
+    document.getElementById('mMAO').nextElementSibling.textContent='70% ARV − costs';
+  }
   document.getElementById('mProfit').textContent=fmt(profit);
   document.getElementById('mProfitSub').textContent=exit==='wholesale'?'Assignment fee':'After all costs';
   document.getElementById('mROI').textContent=fmtPct(roi);
   const prRows=[['Estimated ARV',arv>0?fmt(arv):'N/A — add comps',false],['Max allowable offer (MAO)',mao>0?fmt(mao):'—',false],['Total acquisition costs',fmt(totalCosts),false],['Recommended list / assign price',fmt(listPrice),true],['Projected profit',fmt(profit),true]];
   document.getElementById('priceRows').innerHTML=prRows.map(([k,v,big])=>`<div class="price-row"><span class="price-key">${k}</span><span class="price-val${big?' big':''}">${v}</span></div>`).join('');
+
+  // Three-offer structure
+  const threeOfferCard=document.getElementById('threeOfferCard');
+  if(mao>0&&!flBlocked){
+    threeOfferCard.style.display='block';
+    const offerA=mao;
+    const offerB=mao*1.125;
+    const offerC=mao*1.25;
+    document.getElementById('threeOfferGrid').innerHTML=`
+      <div class="offer-card offer-a">
+        <div class="offer-letter">OPTION A</div>
+        <div class="offer-title">Fast Cash Close</div>
+        <div class="offer-price">${fmt(offerA)}</div>
+        <div class="offer-timeline">Close in 14–21 days</div>
+        <div class="offer-terms">All cash · No contingencies · You handle all closing costs</div>
+      </div>
+      <div class="offer-card offer-b">
+        <div class="offer-letter">OPTION B</div>
+        <div class="offer-title">Standard Close</div>
+        <div class="offer-price">${fmt(offerB)}</div>
+        <div class="offer-timeline">Close in 30–45 days</div>
+        <div class="offer-terms">Cash · Standard due diligence period · Title company handles everything</div>
+      </div>
+      <div class="offer-card offer-c">
+        <div class="offer-letter">OPTION C</div>
+        <div class="offer-title">Extended / Seller Finance</div>
+        <div class="offer-price">${fmt(offerC)}</div>
+        <div class="offer-timeline">60–90 days or installment</div>
+        <div class="offer-terms">Down payment + monthly payments · Higher price, flexible terms · You set the schedule</div>
+      </div>`;
+    document.getElementById('threeOfferNote').textContent=`All three offers based on MAO of ${fmt(mao)}. Option A is your target — present all three so the seller negotiates between B and C, not down from A.`;
+  } else {
+    threeOfferCard.style.display='none';
+  }
 
   // Wholesale offer tiers
   const tiersCard = document.getElementById('wholesaleTiersCard');
@@ -356,7 +589,31 @@ function analyze(){
   if(flood==='yes')insights.push({c:'#e07070',t:'Flood zone — lower demand, financing challenges.'});
   if(utilities==='none')insights.push({c:'#d4a64a',t:'No utilities — factor in cost to bring power/water.'});
   if(compData.length<2)insights.push({c:'#d4a64a',t:'Fewer than 2 comps — ARV is unreliable.'});
-  if(hoa==='yes')insights.push({c:'#d4a64a',t:'HOA/POA — get dues and restrictions before closing.'});
+  if(hoa==='yes'){
+    if(propertyType==='platted'){
+      if(hoaCompsConfirmed)
+        insights.push({c:'#7ec8a0',t:`HOA comps confirmed same-HOA only. ${hoaDiscountPct}% discount applied to ARV — adjusted ARV reflects typical HOA discount.`});
+      else
+        insights.push({c:'#e07070',t:'HOA/POA present — comps MUST come from within this same HOA only. Check the box above to confirm and apply the HOA discount to ARV.'});
+    } else {
+      insights.push({c:'#d4a64a',t:'HOA/POA — confirm active status, dues amount, and no assignment restrictions before closing.'});
+    }
+  }
+  if(flDetected){
+    if(flBlocked)
+      insights.push({c:'#e07070',t:'Florida parcel — wetlands (NWI) and sinkhole (FDEP) checks must be confirmed before MAO is valid. Do not contract without completing both.'});
+    else
+      insights.push({c:'#7ec8a0',t:'Florida DD checks confirmed — wetlands and sinkhole both cleared.'});
+    if(isHighSinkholeRisk())
+      insights.push({c:'#d4a64a',t:'High sinkhole risk county (Lee, Polk, or Pasco). A sinkhole on or adjacent to the parcel will block retail buyer financing.'});
+  }
+  // property-type-specific insights
+  if(propertyType==='platted'){
+    if(acreage>0&&acreage<0.5)insights.push({c:'#7ec8a0',t:`Platted infill lot (${acreage} ac / ${Math.round(sqft).toLocaleString()} sqft) — $/sqft comp metric applied. Per-acre scaling would be unreliable at this lot size.`});
+    if(compData.length>=3)insights.push({c:'#7ec8a0',t:'3+ comps — platted subdivision has good data. Median $/sqft used for ARV.'});
+  } else {
+    if(acreage>0&&acreage<0.5)insights.push({c:'#e07070',t:`Parcel is only ${acreage} ac — per-acre comp scaling is unreliable at this size. Consider switching to "Platted Infill Lot" mode.`});
+  }
   if(insights.length===0)insights.push({c:'#7ec8a0',t:'No major red flags on current inputs.'});
   document.getElementById('insightsList').innerHTML=insights.map(i=>`<div class="insight-row"><span class="insight-dot" style="background:${i.c};"></span><span>${i.t}</span></div>`).join('');
   document.getElementById('motivationTag').textContent=saleReason?reasonLabels[saleReason]:'General';
@@ -399,10 +656,17 @@ function getFormState() {
     wholesaleFee:  document.getElementById('wholesaleFee').value,
     monthsToSell:  document.getElementById('monthsToSell').value,
     compRows,
+    propertyType,
+    hoaCompsConfirmed: document.getElementById('hoaCompsConfirmed').checked,
+    hoaDiscount:       document.getElementById('hoaDiscount').value,
+    flWetlands:        document.getElementById('flWetlands').checked,
+    flSinkhole:        document.getElementById('flSinkhole').checked,
+    ddState:           getDDState(),
   };
 }
 
 function restoreFormState(state) {
+  setPropType(state.propertyType || 'platted');
   document.getElementById('county').value       = state.county       || '';
   document.getElementById('apn').value          = state.apn          || '';
   document.getElementById('acreage').value      = state.acreage      || '';
@@ -423,10 +687,17 @@ function restoreFormState(state) {
   document.getElementById('exitStrategy').value = state.exitStrategy || 'wholesale';
   document.getElementById('wholesaleFee').value = state.wholesaleFee || '';
   document.getElementById('monthsToSell').value = state.monthsToSell || '3';
+  document.getElementById('hoaCompsConfirmed').checked = state.hoaCompsConfirmed || false;
+  document.getElementById('hoaDiscount').value = state.hoaDiscount || '15';
+  document.getElementById('flWetlands').checked = state.flWetlands || false;
+  document.getElementById('flSinkhole').checked = state.flSinkhole || false;
+  updateFlChecks();
+  updateHoaCompSection();
   // rebuild comps
   comps = [];
   document.getElementById('compsContainer').innerHTML = '';
   (state.compRows || []).forEach(c => addComp(c.addr, c.acres, c.price, c.date));
+  restoreDDState(state.ddState || null);
   // hide stale results
   document.getElementById('results').style.display = 'none';
 }
@@ -469,6 +740,7 @@ function loadDeal(id) {
   const deal = loadDeals().find(d => d.id === id);
   if (!deal) return;
   restoreFormState(deal.state);
+  setTab('analyzer');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -478,7 +750,179 @@ function deleteDeal(id) {
   renderSavedDeals();
 }
 
+// ── Tab switching ─────────────────────────────────────────────
+function setTab(tab){
+  document.getElementById('analyzerView').style.display=tab==='analyzer'?'block':'none';
+  document.getElementById('ddView').style.display=tab==='dd'?'block':'none';
+  document.getElementById('tabAnalyzer').classList.toggle('active',tab==='analyzer');
+  document.getElementById('tabDD').classList.toggle('active',tab==='dd');
+}
+
+// ── Due Diligence data ────────────────────────────────────────
+const DD_SECTIONS=[
+  {id:'s1',title:'Section 1 — Pre-Offer Filters',subtitle:'Run before Abner makes any offer. Data-checkable without a call.',scoring:'Score: 10–15 = Priority 1 (same-day contact) · 6–9 = Priority 2 · Below 6 = Cold',
+   items:[
+    {id:'p1',group:'1.1 County & Market Fit',label:'Parcel is in active GC Land Group target county (FL: Lee, Pasco, Polk, Osceola, Marion / AZ: Mohave, Pinal, Yavapai)'},
+    {id:'p2',group:'1.1 County & Market Fit',label:'County has confirmed active comparable sales within the last 18 months'},
+    {id:'p3',group:'1.1 County & Market Fit',label:'County is within 1–3 hour drive window from a major metro'},
+    {id:'p4',group:'1.1 County & Market Fit',label:'No active development moratorium in the municipality'},
+    {id:'p5',group:'1.2 Parcel Profile',label:'Lot size is under 2.0 acres (platted infill profile)'},
+    {id:'p6',group:'1.2 Parcel Profile',label:'Parcel classified as vacant land / no improvements on record (county assessor confirmed)'},
+    {id:'p7',group:'1.2 Parcel Profile',label:'Parcel is within a recorded subdivision plat (plat map on file with county)'},
+    {id:'p8',group:'1.2 Parcel Profile',label:'Parcel is NOT in a flood zone (FEMA Zone X preferred — avoid AE, VE, AO)'},
+    {id:'p9',group:'1.2 Parcel Profile',label:'Parcel has a legal lot number and APN confirmed'},
+    {id:'p10',group:'1.3 Seller Profile Signals',label:'Owner mailing address is out-of-state (absentee owner)'},
+    {id:'p11',group:'1.3 Seller Profile Signals',label:'Owner has held parcel 5+ years without a transaction'},
+    {id:'p12',group:'1.3 Seller Profile Signals',label:'Tax delinquency present (bonus if 2+ years)'},
+    {id:'p13',group:'1.3 Seller Profile Signals',label:'Owner has NOT listed on MLS, Zillow, or LandWatch recently'},
+    {id:'p14',group:'1.3 Seller Profile Signals',label:'Owner has multiple parcels in same county (inherited / estate profile)'},
+    {id:'p15',group:'1.3 Seller Profile Signals',label:'Owner has no recent permit activity on the parcel'},
+  ]},
+  {id:'s2',title:'Section 2 — Property Qualification',subtitle:'Run before locking up a contract. Verify via county GIS, satellite imagery, and assessor data.',
+   items:[
+    {id:'q1',group:'2.1 Access & Road Frontage',critical:true,label:'Parcel has direct frontage on a publicly maintained road (verify county GIS road layer — not Google Maps alone)'},
+    {id:'q2',group:'2.1 Access & Road Frontage',critical:true,label:'If no direct frontage: recorded ingress/egress easement exists in title'},
+    {id:'q3',group:'2.1 Access & Road Frontage',critical:true,label:'Parcel is NOT landlocked'},
+    {id:'q4',group:'2.1 Access & Road Frontage',label:'Physical road access is passable (not seasonal-only, not gated)'},
+    {id:'q5',group:'2.1 Access & Road Frontage',label:'Driveway or curb cut access is feasible from the road'},
+    {id:'q6',group:'2.2 Utilities',label:'Electric service available at or near property line'},
+    {id:'q7',group:'2.2 Utilities',label:'Water confirmed: municipal at road OR well feasibility confirmed (AZ: confirm depth + cost estimates)'},
+    {id:'q8',group:'2.2 Utilities',label:'Sewer: municipal at road OR septic feasibility confirmed (prior perc test failed = deal killer unless recreational buyer)'},
+    {id:'q9',group:'2.2 Utilities',label:'Distance to nearest utility connection recorded in feet'},
+    {id:'q10',group:'2.3 Zoning & Land Use',label:'Zoning confirmed via county GIS or planning dept (R-1, R-2, R-3, RSF, RS acceptable; I/C = avoid unless specific buyer exists)'},
+    {id:'q11',group:'2.3 Zoning & Land Use',label:'Future Land Use (FLU) map reviewed — residential development permitted'},
+    {id:'q12',group:'2.3 Zoning & Land Use',label:'No downzoning or rezoning moratorium in progress'},
+    {id:'q13',group:'2.3 Zoning & Land Use',label:'HOA existence confirmed or denied (if HOA: confirm dues, active status, no assignment restrictions)'},
+    {id:'q14',group:'2.4 Wetlands & Environmentals',label:'NOT in FEMA Special Flood Hazard Area (check msc.fema.gov)'},
+    {id:'q15',group:'2.4 Wetlands & Environmentals',label:'No FEMA-designated wetlands (check fws.gov/wetlands — National Wetlands Inventory)'},
+    {id:'q16',group:'2.4 Wetlands & Environmentals',label:'No conservation easement or environmental overlay (FL: CARL, Florida Forever / AZ: BLM adjacency)'},
+    {id:'q17',group:'2.4 Wetlands & Environmentals',label:'No evidence of environmental contamination (dumping, underground tanks)'},
+    {id:'q18',group:'2.4 Wetlands & Environmentals',label:'NOT in a FEMA regulatory floodway'},
+    {id:'q19',group:'2.4 Wetlands & Environmentals',label:'No sinkholes mapped on or adjacent to parcel (FL only — check FDEP database)'},
+    {id:'q20',group:'2.5 Title & Legal Standing',label:'Clear chain of title (no gaps, no unknown heirs)'},
+    {id:'q21',group:'2.5 Title & Legal Standing',label:'No open liens, judgments, or municipal code violations on record'},
+    {id:'q22',group:'2.5 Title & Legal Standing',label:'Back taxes confirmed: exact amount known and reflected in MAO'},
+    {id:'q23',group:'2.5 Title & Legal Standing',label:'No IRS tax liens, estate disputes, or probate issues flagged'},
+    {id:'q24',group:'2.5 Title & Legal Standing',label:'Deed type confirmed — Warranty Deed preferred; Quit Claim Deed = run title search first'},
+    {id:'q25',group:'2.5 Title & Legal Standing',label:'Property NOT in active bankruptcy proceedings'},
+    {id:'q26',group:'2.5 Title & Legal Standing',label:'No lis pendens (pending lawsuit) on the parcel'},
+    {id:'q27',group:'2.5 Title & Legal Standing',label:'Parcel boundaries match legal description'},
+    {id:'q28',group:'2.6 Buildability & Physical Site',label:'Minimum lot size for the zoning district is met'},
+    {id:'q29',group:'2.6 Buildability & Physical Site',label:'Terrain is buildable — not excessively steep or low-lying (verify via satellite/topo)'},
+    {id:'q30',group:'2.6 Buildability & Physical Site',label:'No visible dumping, debris, or junk (check recent satellite imagery — disclose or price removal into MAO)'},
+    {id:'q31',group:'2.6 Buildability & Physical Site',label:'Lot dimensions are standard for the subdivision (not an odd remnant or flag lot)'},
+    {id:'q32',group:'2.6 Buildability & Physical Site',label:'Neighboring parcels are developed or under development (active market signal)'},
+    {id:'q33',group:'2.6 Buildability & Physical Site',label:'No easements crossing the buildable area'},
+  ]},
+  {id:'s3',title:'Section 3 — Comp Methodology',subtitle:'Run alongside the Land Deal Analyzer MAO calculation.',
+   items:[
+    {id:'c1',group:'3.1 Comparable Sales',label:'Minimum 3 comparable sales pulled (CLOSED sales only — not active listings)'},
+    {id:'c2',group:'3.1 Comparable Sales',label:'Comps are within same subdivision OR within 1.0 mile radius'},
+    {id:'c3',group:'3.1 Comparable Sales',label:'Comps sold within the last 18 months (12 months preferred in active markets)'},
+    {id:'c4',group:'3.1 Comparable Sales',label:'Comps are similar lot size (within 25% of subject lot size)'},
+    {id:'c5',group:'3.1 Comparable Sales',label:'Comps are same zoning classification as subject parcel'},
+    {id:'c6',group:'3.1 Comparable Sales',label:'HOA and non-HOA comps are separated — NEVER mixed'},
+    {id:'c7',group:'3.1 Comparable Sales',label:'Price per square foot AND price per acre both calculated'},
+    {id:'c8',group:'3.1 Comparable Sales',label:'Median used (not average) when comp spread is significant'},
+  ]},
+  {id:'s4',title:'Section 4 — Disposition Readiness',subtitle:'Run before Kyra begins marketing.',
+   items:[
+    {id:'d1',group:'4.1 Property Package',label:'Parcel map / plat map screenshot prepared (lot highlighted)'},
+    {id:'d2',group:'4.1 Property Package',label:'GPS coordinates confirmed and tested in Google Maps'},
+    {id:'d3',group:'4.1 Property Package',label:'Google Maps link generated'},
+    {id:'d4',group:'4.1 Property Package',label:'Satellite imagery screenshot pulled (within 2 years)'},
+    {id:'d5',group:'4.1 Property Package',label:'Lot dimensions confirmed (frontage x depth)'},
+    {id:'d6',group:'4.1 Property Package',label:'Utilities status documented: what is at the road, what is needed'},
+    {id:'d7',group:'4.1 Property Package',label:'Access status documented: road type, maintenance, frontage confirmed'},
+    {id:'d8',group:'4.1 Property Package',label:'Zoning and permitted uses documented'},
+    {id:'d9',group:'4.1 Property Package',label:'HOA status and dues documented (if applicable)'},
+    {id:'d10',group:'4.1 Property Package',label:'Back taxes documented'},
+    {id:'d11',group:'4.1 Property Package',label:'3 comparable sales documented with price, date, and distance from subject'},
+    {id:'d12',group:'4.2 Listing',label:'Deal one-pager completed (Canva template)'},
+    {id:'d13',group:'4.2 Listing',label:'Listed on: LandWatch, Facebook Marketplace, Craigslist (minimum)'},
+    {id:'d14',group:'4.2 Listing',label:'Adjacent landowner outreach completed'},
+    {id:'d15',group:'4.2 Listing',label:'Primary buyer list notified (segmented by county + lot size preference)'},
+    {id:'d16',group:'4.2 Listing',label:'Ceiling price set; 21-day price reduction trigger pre-scheduled'},
+  ]},
+];
+
+const DEAL_KILLERS=[
+  {id:'k1',label:'Parcel is landlocked with no recorded easement',action:'STOP — do not contract'},
+  {id:'k2',label:'FEMA Flood Zone AE, VE, or AO',action:'STOP — near-unsellable in FL'},
+  {id:'k3',label:'Failed perc test on record',action:'STOP unless recreational-only buyer confirmed'},
+  {id:'k4',label:'Active HOA with delinquent dues + unknown standing',action:'PAUSE — resolve first'},
+  {id:'k5',label:'Wetlands covering more than 30% of parcel',action:'STOP — buildable area eliminated'},
+  {id:'k6',label:'Open IRS lien or active probate dispute',action:'STOP — title cannot be cleared'},
+  {id:'k7',label:'Price above 60% of median comp after all costs',action:'STOP — margin insufficient'},
+  {id:'k8',label:'No comparable sales within 18 months within 1 mile',action:'STOP — cannot price'},
+  {id:'k9',label:'Seller local, emotionally attached, firm at market value',action:'STOP — not motivated'},
+  {id:'k10',label:'Active MLS listing already exists on the property',action:'STOP — no wholesale advantage'},
+  {id:'k11',label:'FL sinkhole on or adjacent to parcel',action:'STOP — buyer financing blocked'},
+  {id:'k12',label:'Conservation easement or environmental overlay',action:'STOP — development rights may be gone'},
+  {id:'k13',label:'Quit Claim Deed with unknown chain of title',action:'PAUSE — run title search first'},
+];
+
+function renderDDChecklist(){
+  let html='';
+  DD_SECTIONS.forEach(sec=>{
+    const groups={};
+    sec.items.forEach(item=>{if(!groups[item.group])groups[item.group]=[];groups[item.group].push(item);});
+    html+=`<div class="ds-card"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;"><div class="ds-section-label" style="margin:0;">${sec.title}</div><span class="dd-section-count" id="scount_${sec.id}"></span></div><div style="font-size:11px;color:var(--ds-white-faint);margin-bottom:${sec.scoring?'4':'12'}px;">${sec.subtitle}</div>${sec.scoring?`<div style="font-size:11px;color:var(--ds-warn);margin-bottom:12px;">${sec.scoring}</div>`:''}`;
+    Object.entries(groups).forEach(([grp,items])=>{
+      html+=`<div class="dd-group-label">${grp}</div>`;
+      items.forEach(item=>{html+=`<label class="dd-item${item.critical?' dd-critical':''}"><input type="checkbox" id="dd_${item.id}" onchange="updateDDProgress()"><span>${item.label}</span></label>`;});
+    });
+    html+=`</div>`;
+  });
+  html+=`<div class="ds-card dd-killers-card"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;"><div class="ds-section-label" style="margin:0;color:var(--ds-danger);">Section 5 — Deal Killer Flags</div><span class="dd-section-count" id="scount_s5"></span></div><div style="font-size:11px;color:var(--ds-white-faint);margin-bottom:12px;">Check any flag that APPLIES to this deal. Any single item checked = stop or renegotiate before proceeding.</div>`;
+  DEAL_KILLERS.forEach(k=>{html+=`<label class="dd-killer-item"><input type="checkbox" id="dd_${k.id}" onchange="updateDDProgress()"><div><span class="dd-killer-label">${k.label}</span><span class="dd-killer-action">${k.action}</span></div></label>`;});
+  html+=`</div>`;
+  document.getElementById('ddChecklist').innerHTML=html;
+  updateDDProgress();
+}
+
+function updateDDProgress(){
+  let total=0,checked=0;
+  DD_SECTIONS.forEach(sec=>{
+    let sChecked=0;
+    sec.items.forEach(item=>{total++;if(document.getElementById('dd_'+item.id)?.checked){checked++;sChecked++;}});
+    const el=document.getElementById('scount_'+sec.id);
+    if(el)el.textContent=sChecked+' / '+sec.items.length;
+  });
+  let killersFound=0;
+  DEAL_KILLERS.forEach(k=>{if(document.getElementById('dd_'+k.id)?.checked)killersFound++;});
+  const kEl=document.getElementById('scount_s5');
+  if(kEl)kEl.textContent=killersFound>0?killersFound+' flagged':'none flagged';
+  document.getElementById('ddProgressText').textContent=checked+' / '+total+' items confirmed';
+  const killersEl=document.getElementById('ddKillersText');
+  killersEl.textContent=killersFound>0?killersFound+' deal killer'+(killersFound>1?'s':'')+' flagged':'No deal killers flagged';
+  killersEl.style.color=killersFound>0?'var(--ds-danger)':'var(--ds-green)';
+  document.getElementById('ddProgressBar').style.width=(total>0?(checked/total*100):0)+'%';
+}
+
+function getDDState(){
+  const state={};
+  DD_SECTIONS.forEach(sec=>sec.items.forEach(item=>{state[item.id]=document.getElementById('dd_'+item.id)?.checked||false;}));
+  DEAL_KILLERS.forEach(k=>{state[k.id]=document.getElementById('dd_'+k.id)?.checked||false;});
+  return state;
+}
+
+function restoreDDState(state){
+  if(!state)return;
+  DD_SECTIONS.forEach(sec=>sec.items.forEach(item=>{const el=document.getElementById('dd_'+item.id);if(el)el.checked=state[item.id]||false;}));
+  DEAL_KILLERS.forEach(k=>{const el=document.getElementById('dd_'+k.id);if(el)el.checked=state[k.id]||false;});
+  updateDDProgress();
+}
+
+function clearDD(){
+  if(!confirm('Clear all due diligence checkboxes for this deal?'))return;
+  DD_SECTIONS.forEach(sec=>sec.items.forEach(item=>{const el=document.getElementById('dd_'+item.id);if(el)el.checked=false;}));
+  DEAL_KILLERS.forEach(k=>{const el=document.getElementById('dd_'+k.id);if(el)el.checked=false;});
+  updateDDProgress();
+}
+
 renderSavedDeals();
+renderDDChecklist();
 </script>
 </body>
 </html>

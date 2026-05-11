@@ -1,0 +1,405 @@
+# GC Land Group — Land Deal Due Diligence System
+### Built for the GC Land Group Land Deal Analyzer · FL & AZ Vacant Lot Focus
+
+---
+
+## HOW TO USE THIS FILE
+
+This document is a modular due diligence framework for vacant platted lots in GC Land Group's active FL and AZ target counties. Each section maps to a stage of the deal pipeline:
+
+- **Pre-Offer Filters** → Run before Abner makes any offer (Grace / CRM pre-call scoring)
+- **Property Qualification Checklist** → Run before locking up a contract
+- **Offer Pricing Safeguards** → Run alongside the Land Deal Analyzer MAO calculation
+- **Disposition Readiness Check** → Run before Kyra begins marketing
+- **Deal Killer Flags** → Automatic disqualifiers — stop the deal immediately
+- **Lessons & Analyst Notes** → Strategic insights for Claude Code build context
+
+---
+
+## SECTION 1 — PRE-OFFER FILTERS
+> Run at the lead stage inside the CRM before Abner engages. Data-checkable without a call.
+
+### 1.1 County & Market Fit
+- [ ] Parcel is in an active GC Land Group target county
+  - FL targets: Lee, Pasco, Polk, Osceola, Marion
+  - AZ targets: Mohave, Pinal, Yavapai
+- [ ] County has confirmed active comparable sales within the last 18 months
+- [ ] County is within the 1–3 hour drive window from a major metro
+- [ ] No active development moratorium in the municipality
+
+### 1.2 Parcel Profile
+- [ ] Lot size is under 2.0 acres (platted infill profile — not raw acreage)
+- [ ] Parcel is classified as vacant land / no improvements on record (county assessor confirmed)
+- [ ] Parcel is within a recorded subdivision plat (plat map on file with county)
+- [ ] Parcel is NOT in a flood zone (FEMA Zone X preferred; avoid AE, VE, AO)
+- [ ] Parcel has a legal lot number and APN confirmed
+
+### 1.3 Seller Profile Signals
+- [ ] Owner mailing address is out-of-state (absentee owner)
+- [ ] Owner has held parcel 5+ years without a transaction
+- [ ] Tax delinquency present (bonus if 2+ years)
+- [ ] Owner has NOT listed on MLS, Zillow, or LandWatch recently
+- [ ] Owner has multiple parcels in same county (inherited / estate profile)
+- [ ] Owner has no recent permit activity on the parcel
+
+**Pre-Offer Score:** Count checkmarks. 10–15 = Priority 1 (same-day Abner contact). 6–9 = Priority 2. Below 6 = Cold.
+
+---
+
+## SECTION 2 — PROPERTY QUALIFICATION CHECKLIST
+> Run before locking up a contract. Verify via county GIS, satellite imagery, and assessor data.
+
+### 2.1 Access & Road Frontage ⚠️ CRITICAL
+- [ ] Parcel has direct frontage on a publicly maintained road
+  - Confirm road is maintained by county or municipality — not private or unimproved
+  - Verify on county GIS road layer — do NOT rely on Google Maps alone
+- [ ] If no direct frontage: recorded ingress/egress easement exists in title
+- [ ] Parcel is NOT landlocked
+- [ ] Physical road access is passable (not seasonal-only, not gated)
+- [ ] Driveway or curb cut access is feasible from the road
+
+> **ANALYST NOTE:** Landlocked parcels are the #1 source of wholesaler losses.
+> Always verify access on the plat map AND the county road layer.
+> A platted road does NOT guarantee a physical road exists.
+
+### 2.2 Utilities
+- [ ] Electric service available at or near property line
+- [ ] Water confirmed: municipal at road OR well feasibility confirmed
+  - FL: Municipal water typical in Lee, Pasco, Polk platted subdivisions
+  - AZ: Well or shared water common in Mohave/Yavapai — confirm depth + cost estimates
+- [ ] Sewer: municipal at road OR septic feasibility confirmed
+  - If prior perc test FAILED: treat as deal killer unless recreational-only buyer
+  - FL: Confirm lot is NOT in a septic-restricted zone
+- [ ] Distance to nearest utility connection recorded in feet
+
+> **ANALYST NOTE:** A lot with utilities at the road is worth significantly more
+> than one requiring $30,000+ in infrastructure. Quantify the utility gap
+> and reflect it in your MAO. Buyers will ask immediately.
+
+### 2.3 Zoning & Land Use
+- [ ] Zoning confirmed via county GIS or planning department
+  - Acceptable: R-1, R-2, R-3, RSF, RS (Residential Single Family variants)
+  - Review: A-1, AG (Agricultural) — confirm residential use is permitted
+  - Avoid: I (Industrial), C (Commercial) unless specific buyer exists
+- [ ] Future Land Use (FLU) map reviewed — residential development permitted
+- [ ] No downzoning or rezoning moratorium in progress
+- [ ] HOA existence confirmed or denied
+  - If HOA exists: confirm active status, dues amount, current payment status
+  - CRITICAL: HOA comps must come from WITHIN the same HOA only
+  - Confirm no HOA restrictions preventing assignment or quick resale
+
+> **ANALYST NOTE:** HOA status is one of the most common comp errors in platted
+> lot deals. Comps outside an HOA are INVALID for a lot inside an HOA.
+> HOA lots often sell at a 10–20% discount to non-HOA lots.
+> Always separate HOA and non-HOA comps.
+
+### 2.4 Wetlands, Environmentals & Overlays
+- [ ] NOT in FEMA Special Flood Hazard Area (check msc.fema.gov)
+- [ ] No FEMA-designated wetlands (check fws.gov/wetlands — National Wetlands Inventory)
+- [ ] No conservation easement or environmental overlay
+  - FL: Check for CARL, Florida Forever, or county conservation restrictions
+  - AZ: Check BLM adjacency and scenic/environmental corridors
+- [ ] No evidence of environmental contamination (dumping, underground tanks)
+- [ ] NOT in a FEMA regulatory floodway
+- [ ] No sinkholes mapped on or adjacent to parcel (FL only — check FDEP database)
+
+> **ANALYST NOTE (FL):** Sinkhole risk is real and underpriced by most investors.
+> Lee, Polk, and Pasco all have sinkhole-susceptible geology.
+> A sinkhole on or adjacent to a parcel blocks retail buyer financing.
+> Check FDEP database before ANY FL contract — mandatory, not optional.
+
+### 2.5 Title & Legal Standing
+- [ ] Clear chain of title (no gaps, no unknown heirs)
+- [ ] No open liens, judgments, or municipal code violations on record
+- [ ] Back taxes confirmed: exact amount known and reflected in MAO
+- [ ] No IRS tax liens, estate disputes, or probate issues flagged
+- [ ] Deed type: Warranty Deed preferred; Quit Claim Deed = additional title research required
+- [ ] Property NOT in active bankruptcy proceedings
+- [ ] No lis pendens (pending lawsuit) on the parcel
+- [ ] Parcel boundaries match legal description
+
+> **ANALYST NOTE:** Quit Claim Deeds are common in delinquent tax / inherited
+> scenarios — they do NOT guarantee clear title. If seller offers a QCD,
+> always run title before committing to assignment.
+> Clean title = faster close and easier disposition.
+
+### 2.6 Buildability & Physical Site
+- [ ] Minimum lot size for the zoning district is met
+- [ ] Terrain is buildable — not excessively steep, not low-lying (verify via satellite/topo)
+  - AZ: Hillside/slope ordinances in Pinal and Yavapai restrict steep lot builds
+- [ ] No visible dumping, debris, or junk (check recent satellite imagery)
+  - If junk present: disclose fully OR price removal cost into MAO
+- [ ] Lot dimensions are standard for the subdivision (not an odd remnant or flag lot)
+- [ ] Neighboring parcels are developed or under development (active market signal)
+- [ ] No easements crossing the buildable area
+
+---
+
+## SECTION 3 — OFFER PRICING SAFEGUARDS
+> Run alongside the Land Deal Analyzer MAO calculation.
+
+### 3.1 Comparable Sales Methodology
+- [ ] Minimum 3 comparable sales pulled (CLOSED sales only — not active listings)
+- [ ] Comps are within same subdivision OR within 1.0 mile radius
+- [ ] Comps sold within the last 18 months (12 months preferred in active markets)
+- [ ] Comps are similar lot size (within 25% of subject lot size)
+- [ ] Comps are same zoning classification as subject parcel
+- [ ] HOA and non-HOA comps are separated — NEVER mix
+- [ ] Price per square foot AND price per acre both calculated
+- [ ] Median used (not average) when comp spread is significant
+
+> **ANALYST NOTE:** In platted subdivision lots, price per square foot
+> outperforms price per acre as a comp metric. A 0.17-acre lot does NOT
+> scale linearly from a 1.0-acre comp. Build both calculations into the
+> analyzer output and display them side by side.
+
+### 3.2 MAO Formula
+
+```
+MAO = (Median Comp Value x Target Acquisition %) - Estimated Costs
+
+Target Acquisition %:
+  Hot lead, clean title, utilities present:     35-45% of median comp
+  Warm lead, minor issues:                      30-40% of median comp
+  Cold lead or known defects:                   25-35% of median comp
+
+Estimated Costs to subtract:
+  Back taxes owed (exact from county)
+  Title / closing costs (~$500–$1,500 for vacant land)
+  Removal / remediation (junk, debris)
+  Assignment fee target ($3,000–$15,000 for infill lots)
+```
+
+### 3.3 Three-Offer Output Structure
+
+```
+Option A — Fast Cash Close
+  Price:       MAO as calculated
+  Close:       14–21 days
+  Terms:       Cash, no contingencies
+
+Option B — Standard Close
+  Price:       MAO + 10–15%
+  Close:       30–45 days
+  Terms:       Cash with standard due diligence period
+
+Option C — Extended / Seller Finance
+  Price:       MAO + 20–30%
+  Close:       60–90 days or installment
+  Terms:       Down payment + monthly payments at agreed interest rate
+```
+
+> **ANALYST NOTE (Apke Brothers):** Never enter a deal where your worst-case
+> floor is unclear. "Best case $20K, worst case maybe $9K" is not a deal —
+> it is a hope. Your floor must be certain before your ceiling matters.
+
+---
+
+## SECTION 4 — DISPOSITION READINESS CHECK
+> Run before Kyra begins marketing.
+
+### 4.1 Property Package
+- [ ] Parcel map / plat map screenshot prepared (lot highlighted)
+- [ ] GPS coordinates confirmed and tested in Google Maps
+- [ ] Google Maps link generated
+- [ ] Satellite imagery screenshot pulled (within 2 years)
+- [ ] Lot dimensions confirmed (frontage x depth)
+- [ ] Utilities status documented: what is at the road, what is needed
+- [ ] Access status documented: road type, maintenance, frontage confirmed
+- [ ] Zoning and permitted uses documented
+- [ ] HOA status and dues documented (if applicable)
+- [ ] Back taxes documented
+- [ ] 3 comparable sales documented with price, date, and distance from subject
+
+### 4.2 Listing Requirements
+- [ ] Deal one-pager completed (Canva template)
+- [ ] Listed on: LandWatch, Facebook Marketplace, Craigslist (minimum)
+- [ ] Adjacent landowner outreach completed
+- [ ] Primary buyer list notified (segmented by county + lot size preference)
+- [ ] Ceiling price set; 21-day price reduction trigger pre-scheduled
+
+---
+
+## SECTION 5 — DEAL KILLER FLAGS
+> Any single item = stop the deal or renegotiate before proceeding.
+
+| # | Flag | Action |
+|---|------|--------|
+| 1 | Parcel is landlocked with no recorded easement | STOP — do not contract |
+| 2 | FEMA Flood Zone AE, VE, or AO | STOP — near-unsellable in FL |
+| 3 | Failed perc test on record | STOP unless recreational-only buyer confirmed |
+| 4 | Active HOA with delinquent dues + unknown standing | PAUSE — resolve first |
+| 5 | Wetlands covering more than 30% of parcel | STOP — buildable area eliminated |
+| 6 | Open IRS lien or active probate dispute | STOP — title cannot be cleared |
+| 7 | Price above 60% of median comp after all costs | STOP — margin insufficient |
+| 8 | No comparable sales within 18 months within 1 mile | STOP — cannot price |
+| 9 | Seller local, emotionally attached, firm at market value | STOP — not motivated |
+| 10 | Active MLS listing already exists on the property | STOP — no wholesale advantage |
+| 11 | FL sinkhole on or adjacent to parcel | STOP — buyer financing blocked |
+| 12 | Conservation easement or environmental overlay | STOP — development rights may be gone |
+| 13 | Quit Claim Deed with unknown chain of title | PAUSE — run title search first |
+
+---
+
+## SECTION 6 — LESSONS & ANALYST NOTES FOR DEAL ANALYZER BUILD
+> Implementation notes for Claude Code. Sources: Apke Brothers, Mark Podolsky
+> (The Land Geek / Nite Cap), Land Investing Business Secrets Podcast.
+
+---
+
+### 6.1 Never Price Infill Lots Per Acre
+
+**Lesson:** A 0.17-acre lot does not scale linearly from a 1.0-acre comp.
+In platted subdivisions, price per square foot or flat comparable value is correct.
+
+**Build note:** Trigger a warning if MAO is calculated using price-per-acre on
+any parcel under 0.5 acres. Auto-suggest price-per-square-foot calculation instead.
+
+---
+
+### 6.2 Speed Protects the Deal
+
+**Lesson (Apke Brothers):** Every day of delay gives the seller more time to back out.
+Fast operators get under contract in 14–17 days from first contact.
+The full process from listing to payout averages 6–7 weeks.
+
+**Build note:** Add a deal timeline tracker. Flag any deal stalled in a single stage
+for more than 14 days. Alert JC / Matt via Slack. Display elapsed days prominently
+on each deal card in the dashboard.
+
+---
+
+### 6.3 HOA Comp Contamination
+
+**Lesson (Apke Brothers):** Comps outside an HOA are completely invalid for a lot
+inside an HOA. Using a non-HOA sold comp to price an HOA lot produces an inflated
+MAO that kills the assignment margin.
+
+**Build note:** Add an HOA toggle. When ON: filter comps to HOA-only sales and apply
+a suggested 10–20% HOA discount factor to the median comp value. Flag any comp input
+where HOA status is unknown or unconfirmed.
+
+---
+
+### 6.4 Three-Offer Output Module
+
+**Lesson (Land Investing Business Secrets — Michael Robertson):** Presenting three
+offer options causes sellers to negotiate against themselves. This increases conversion
+on warm leads and removes the binary yes/no dynamic of a single offer.
+
+**Build note:** When Abner inputs the MAO, auto-generate the three-offer structure
+from Section 3.3 above. Display as a formatted output Abner can reference on a
+live seller call without doing mental math.
+
+---
+
+### 6.5 Florida Wetlands and Sinkhole Are Mandatory Inputs
+
+**Lesson:** Florida's NWI data is inconsistent with county GIS. A parcel that
+appears buildable may carry a wetlands delineation eliminating most usable area.
+Sinkhole risk is underpriced in Lee, Polk, and Pasco counties.
+
+**Build note:** For FL deals, make wetlands check (NWI) and sinkhole check (FDEP)
+REQUIRED inputs. Do not display the MAO output until both are confirmed clean.
+Show a blocking warning if either check is skipped.
+
+---
+
+### 6.6 Comp Radius Confidence Score
+
+**Lesson:** In high-density platted subdivisions, comps within 0.25 miles are
+accurate. In lower-density areas, expanding to 1.0 mile introduces noise —
+access, utilities, and development stage vary significantly within a mile.
+
+**Build note:** Build a comp radius selector (0.25mi / 0.5mi / 1.0mi) with a
+confidence score (High / Medium / Low) that decreases as radius increases.
+Show the number of available comps at each radius level.
+
+---
+
+### 6.7 Disposition Pricing: Three Numbers Required
+
+**Lesson (Apke Brothers):** Overpricing by 10–15% dramatically reduces buyer
+response. Set a ceiling, a 21-day reduction trigger, and a floor before listing.
+
+**Build note:** Disposition module outputs three numbers:
+  1. Ceiling list price — highest defensible price based on comps
+  2. 21-day reduction price — ceiling minus 10–15%
+  3. Floor / break-even = min assignment fee + acquisition price + closing costs
+Never display a list price below the floor. If ceiling is below floor, flag deal
+as a margin failure before Abner contracts it.
+
+---
+
+### 6.8 Platted Lots vs. Rural Acreage Are Different Asset Classes
+
+**Lesson:** Platted lots = more comps, faster velocity, retail buyer pools,
+predictable pricing. Rural acreage = higher margins, lower competition, longer
+hold times, more complex DD. Do not run the same workflow on both.
+
+**Build note:** Add a property type toggle at the top of the analyzer:
+"Platted Infill Lot" vs. "Rural Acreage." Each activates a different set of
+DD prompts, comp methodology, MAO formula, and buyer profile assumptions.
+
+---
+
+### 6.9 Document Seller Defect Reasoning
+
+**Lesson (Nite Cap / Apke Brothers):** Most sellers understand there is a defect
+with their land and will accept reductions given clear reasoning. Documenting
+protects GC Land Group from disputes during assignment or closing.
+
+**Build note:** Add a required negotiation notes field. Before deal status can move
+from Negotiating to Under Contract, Abner must document:
+  1. Defects disclosed to the seller
+  2. Reasoning given for the offer price
+  3. Seller's stated response
+
+---
+
+### 6.10 Track Lead Source to Close Rate
+
+**Lesson (Land Investing Business Secrets):** Tracking which lead sources produce
+the highest close rates enables smarter list-building and marketing spend decisions.
+
+**Build note:** Add a lead source field on every deal record:
+  Options: TaxLead | Land Portal | PropStream | County Assessor Download |
+           Cold Call (Grace) | Adjacent Outreach | Referral | Other
+Feed into KPI dashboard as a monthly lead source → close rate report.
+
+---
+
+## SECTION 7 — QUICK REFERENCE: DD BY COUNTY
+
+| County | Top DD Priorities | Primary Risk Flags |
+|--------|------------------|-------------------|
+| Lee (FL) | Flood zone, utilities, HOA, sinkhole | FEMA AE zones, failed perc, NWI wetlands |
+| Pasco (FL) | Road access (unbuilt plats), utilities, flood | Unimproved roads, wetlands, HOA delinquency |
+| Polk (FL) | Zoning (citrus conversions), utilities, access | Ag zoning, drainage easements, FLU mismatch |
+| Osceola (FL) | HOA (Poinciana), utilities, flood zone | HOA dues, low-lying flood risk |
+| Mohave (AZ) | Road access (legacy unbuilt roads), water, zoning | No physical road despite plat, no water infra |
+| Pinal (AZ) | Road access, water (CAP vs. well), slope | Steep terrain, ag-to-residential transitions |
+| Yavapai (AZ) | Water (well depth), hillside ordinance, access | Well costs $15K–$40K+, hillside restrictions |
+
+---
+
+## SECTION 8 — DATA SOURCES
+
+| Tool | Use Case | URL |
+|------|----------|-----|
+| FEMA Flood Map Service | Flood zone verification | msc.fema.gov |
+| National Wetlands Inventory | Wetlands overlay | fws.gov/wetlands |
+| FDEP Sinkhole Database | FL sinkhole risk | floridadep.gov |
+| County GIS / Assessor | Parcel data, ownership, zoning | County-specific |
+| TaxLead | Delinquent tax leads | Internal tool |
+| The Land Portal | Filtered list building | thelandportal.com |
+| PropStream / Regrid | Ownership data, parcel mapping | propstream.com |
+| Google Earth Pro | Terrain, slope, satellite view | earth.google.com |
+| USGS Topo Maps | Elevation and slope analysis | usgs.gov |
+| Acres.com | Parcel counts, market data | acres.com |
+
+---
+
+Version 1.0 — GC Land Group — FL and AZ markets
+Sources: Apke Brothers (Land Investing Online / The Land Portal),
+Mark Podolsky (The Land Geek / Nite Cap), Land Investing Business Secrets Podcast

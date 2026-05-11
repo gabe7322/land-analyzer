@@ -199,6 +199,14 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
   <div id="lpStatus" class="lp-status" style="display:none;"></div>
   <div id="lpResultsPicker" class="lp-picker" style="display:none;"></div>
   <div id="lpEstimates" class="lp-estimates-grid" style="display:none;"></div>
+  <div id="lpSlope" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--ds-border);">
+    <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ds-green-dim);margin-bottom:8px;">Slope &amp; Buildability</div>
+    <div id="lpSlopeContent"></div>
+  </div>
+  <div id="lpDDBtn" style="display:none;margin-top:12px;">
+    <button class="btn-save" onclick="autofillDDFromLP()" style="background:rgba(126,200,160,0.08);border-color:var(--ds-green-dim);color:var(--ds-green);font-size:12px;padding:7px 16px;">Pre-fill Due Diligence from LandPortal →</button>
+    <span id="lpDDFillStatus" style="font-size:11px;color:var(--ds-white-faint);margin-left:10px;"></span>
+  </div>
   <div id="lpRawWrap" style="display:none;">
     <button class="btn-save" onclick="toggleLpRaw()" style="margin-top:8px;font-size:11px;">Toggle raw API data</button>
     <pre id="lpRaw" style="display:none;font-size:10px;color:var(--ds-white-faint);overflow:auto;max-height:220px;margin-top:8px;background:var(--ds-surface2);padding:10px;border-radius:8px;border:1px solid var(--ds-border);white-space:pre-wrap;word-break:break-all;"></pre>
@@ -729,6 +737,9 @@ async function lpLookup(){
   document.getElementById('lpProgress').style.display='flex';
   document.getElementById('lpResultsPicker').style.display='none';
   document.getElementById('lpEstimates').style.display='none';
+  document.getElementById('lpSlope').style.display='none';
+  document.getElementById('lpDDBtn').style.display='none';
+  document.getElementById('lpDDFillStatus').textContent='';
   document.getElementById('lpRawWrap').style.display='none';
   lpRawData={};
   lpSetPill(1,'active');lpSetPill(2,'idle');lpSetPill(3,'idle');
@@ -877,6 +888,7 @@ function autofillCompReport(r){
   estEl.innerHTML=metrics.map(([l,v])=>`<div class="ds-metric"><div class="ds-metric-label">${l}</div><div class="ds-metric-val" style="font-size:15px;">${v}</div></div>`).join('');
   if(r.link)estEl.innerHTML+=`<div style="grid-column:1/-1;margin-top:4px;"><a href="${r.link}" target="_blank" style="font-size:12px;color:var(--ds-green);">View on LandPortal →</a></div>`;
   estEl.style.display='grid';
+  renderLpSlope(lpRawData.property?.data?.property||{},r);
   updateFlChecks();
 }
 function guessZoning(raw){
@@ -889,10 +901,77 @@ function guessZoning(raw){
   if(r.includes('res')||r.includes('single')||r.includes('multi'))return 'residential';
   return '';
 }
+function renderLpSlope(p,r){
+  const slopeAvg=parseFloat(p.slope_average||0);
+  const buildability=parseFloat(p.buildability_total_perc||0);
+  const elevAvg=parseFloat(p.elevation_average||r.elevation_average||0);
+  const elevMin=parseFloat(p.elevation_min||0);
+  const elevMax=parseFloat(p.elevation_max||0);
+  if(!slopeAvg&&!buildability)return;
+  const bands=[
+    {label:'Flat (0–0.5°)',pct:parseFloat(p.percentage_of_land_with_flat_slope_0_05||r.flop0_05||0),color:'#7ec8a0'},
+    {label:'Minimal (0.5–5°)',pct:parseFloat(p.percentage_of_land_with_minimal_slope_05_5||r.flop05_5||0),color:'#4d9970'},
+    {label:'Moderate (5–10°)',pct:parseFloat(p.percentage_of_land_with_moderate_slope_5_10||r.flop5_10||0),color:'#d4a64a'},
+    {label:'Heavy (10–15°)',pct:parseFloat(p.percentage_of_land_with_heavy_slope_10_15||r.flop10_15||0),color:'#e07070'},
+    {label:'Extreme (15°+)',pct:parseFloat(p.percentage_of_land_with_extreme_slope_15||r.flop15_||0),color:'#b03030'},
+  ];
+  const elevStr=elevAvg>0?`${Math.round(elevAvg)} ft avg`+(elevMin&&elevMax?` · ${Math.round(elevMin)}–${Math.round(elevMax)} ft range`:''):'—';
+  const barHtml=`<div style="display:flex;height:10px;border-radius:5px;overflow:hidden;margin:8px 0;">${bands.map(b=>b.pct>0?`<div style="width:${b.pct}%;background:${b.color};" title="${b.label}: ${b.pct.toFixed(1)}%"></div>`:'').join('')}</div>`;
+  const legendHtml=`<div style="display:flex;flex-wrap:wrap;gap:8px 14px;">${bands.map(b=>`<span style="font-size:10px;color:var(--ds-white-faint);display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${b.color};flex-shrink:0;"></span>${b.label}: ${b.pct.toFixed(1)}%</span>`).join('')}</div>`;
+  document.getElementById('lpSlopeContent').innerHTML=`<div style="display:flex;gap:20px;font-size:12px;color:var(--ds-white-dim);margin-bottom:4px;flex-wrap:wrap;"><span>Avg slope <strong style="color:var(--ds-white);">${slopeAvg.toFixed(1)}°</strong></span><span>Buildability <strong style="color:var(--ds-green);">${buildability.toFixed(1)}%</strong></span><span>Elevation <strong style="color:var(--ds-white);">${elevStr}</strong></span></div>${barHtml}${legendHtml}`;
+  document.getElementById('lpSlope').style.display='block';
+}
+
+function autofillDDFromLP(){
+  const search=lpRawData.search?.data?.features?.[0]?.properties||{};
+  const prop=lpRawData.property?.data?.property||{};
+  const report=lpRawData.report?.data||{};
+  const county=(search.county||prop.situscounty||'').toLowerCase();
+  const state=(search.state||prop.situsstate||'').toLowerCase();
+  const FL_TARGETS=['lee','pasco','polk','osceola','marion'];
+  const AZ_TARGETS=['mohave','pinal','yavapai'];
+  const isTarget=FL_TARGETS.some(c=>county.includes(c))||AZ_TARGETS.some(c=>county.includes(c));
+  const acres=parseFloat(prop.lotsizeacres||prop.calc_acres||report.size||0);
+  const hasBuildings=parseFloat(prop.buildingarea||0)>0||parseFloat(prop.sumbuildingsqft||0)>0;
+  const inSubdivision=!!(prop.subdivisionname);
+  const hasApn=!!(search.apn||prop.apn);
+  const fema=parseFloat(prop.fema_cover_percentage||report.fema_cover_percentage||0);
+  const floodText=(prop.flfemafloodzone||'').toLowerCase();
+  const notInFlood=fema===0&&(floodText.includes('not in')||prop.fema_cover_percentage==='0'||report.fema_cover_percentage==='0');
+  const landLocked=prop.land_locked===true||prop.land_locked===1||report.land_locked===true;
+  const roadFrontage=parseFloat(prop.road_frontage||report.road_frontage||0);
+  const buildability=parseFloat(prop.buildability_total_perc||0);
+  const wetlandsPct=parseFloat(prop.wetlands_cover_percentage||report.wetlands_cover_percentage||0);
+  const hasWetlandsData=prop.wetlands_cover_percentage!=null||report.wetlands_cover_percentage!=null;
+  const checks={};
+  // Section 1
+  if(isTarget)checks['p1']=true;
+  if(acres>0&&acres<2.0)checks['p5']=true;
+  if(!hasBuildings)checks['p6']=true;
+  if(inSubdivision)checks['p7']=true;
+  if(notInFlood)checks['p8']=true;
+  if(hasApn)checks['p9']=true;
+  // Section 2
+  if(!landLocked&&roadFrontage>0)checks['q1']=true;
+  if(!landLocked)checks['q3']=true;
+  if(!landLocked&&roadFrontage>0)checks['q4']=true;
+  if(notInFlood)checks['q14']=true;
+  if(hasWetlandsData&&wetlandsPct===0)checks['q15']=true;
+  if(notInFlood)checks['q18']=true;
+  if(buildability>70)checks['q29']=true;
+  let count=0;
+  Object.entries(checks).forEach(([id,val])=>{const el=document.getElementById('dd_'+id);if(el&&val){el.checked=true;count++;}});
+  updateDDProgress();
+  setTab('dd');
+  document.getElementById('lpDDFillStatus').textContent=`${count} items confirmed from LandPortal data`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function toggleLpRaw(){const el=document.getElementById('lpRaw');el.style.display=el.style.display==='none'?'block':'none';}
 function showLpRaw(){
   document.getElementById('lpRawWrap').style.display='block';
   document.getElementById('lpRaw').textContent=JSON.stringify(lpRawData,null,2);
+  document.getElementById('lpDDBtn').style.display='block';
 }
 
 // ── Save / Load ──────────────────────────────────────────────

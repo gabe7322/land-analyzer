@@ -178,14 +178,6 @@ body{background:var(--ds-bg);color:var(--ds-white);font-family:system-ui,sans-se
 
 <div class="ds-card lp-lookup-card">
   <div class="ds-section-label" style="margin-bottom:10px;">LandPortal Auto-Fill</div>
-  <div class="lp-jwt-row">
-    <div class="ds-field" style="flex:1;">
-      <label>JWT Token</label>
-      <input type="password" id="lpJwt" placeholder="Paste your LandPortal JWT token…">
-    </div>
-    <button class="btn-save" onclick="saveLpJwt()">Save token</button>
-    <span id="lpJwtStatus" class="badge" style="display:none;align-self:center;"></span>
-  </div>
   <div class="lp-lookup-row">
     <div class="ds-field" style="flex:1;">
       <label>APN / Parcel ID</label>
@@ -714,23 +706,11 @@ function analyze(){
 addComp();
 
 // ── LandPortal API ───────────────────────────────────────────
-const LP_BASE='https://landportal.com/wp-json/lp-rest-api/v1';
+// ← paste your Cloudflare Worker URL here after deploying proxy/worker.js
+const LP_PROXY='https://lp-proxy.YOUR-SUBDOMAIN.workers.dev';
 let lpRawData={};
 
-function getLpJwt(){return localStorage.getItem('lp_jwt')||'';}
-function saveLpJwt(){
-  const v=document.getElementById('lpJwt').value.trim();
-  if(!v)return;
-  localStorage.setItem('lp_jwt',v);
-  document.getElementById('lpJwt').value='';
-  updateLpJwtStatus();
-}
-function updateLpJwtStatus(){
-  const jwt=getLpJwt();
-  const el=document.getElementById('lpJwtStatus');
-  if(jwt){el.textContent='Token saved';el.className='badge badge-ok';el.style.display='inline-block';}
-  else{el.style.display='none';}
-}
+function lpProxyReady(){return!LP_PROXY.includes('YOUR-SUBDOMAIN');}
 function lpSetStatus(msg,type='info'){
   const el=document.getElementById('lpStatus');
   el.style.display='block';
@@ -743,13 +723,13 @@ function lpSetPill(step,state){
   el.className='lp-pill'+(state==='active'?' active':state==='done'?' done':state==='error'?' error':'');
 }
 function lpFetch(url,opts={}){
-  return fetch(url,{...opts,headers:{'Authorization':'Bearer '+getLpJwt(),'Content-Type':'application/json',...(opts.headers||{})}});
+  return fetch(url,{...opts,headers:{'Content-Type':'application/json',...(opts.headers||{})}});
 }
 async function lpLookup(){
   const apn=document.getElementById('lpApn').value.trim();
   const state=document.getElementById('lpState').value.trim().toUpperCase();
   if(!apn||!state){lpSetStatus('Enter APN and state first.','error');return;}
-  if(!getLpJwt()){lpSetStatus('Paste and save your LandPortal JWT token first.','error');return;}
+  if(!lpProxyReady()){lpSetStatus('Proxy not configured — paste your Cloudflare Worker URL into LP_PROXY in index.html.','error');return;}
   document.getElementById('lpProgress').style.display='flex';
   document.getElementById('lpResultsPicker').style.display='none';
   document.getElementById('lpEstimates').style.display='none';
@@ -759,7 +739,7 @@ async function lpLookup(){
   lpSetStatus('Searching parcel…');
   let searchRes;
   try{
-    const r=await lpFetch(`${LP_BASE}/search?type=parcelnumb&query=${encodeURIComponent(apn)}&state=${state}`);
+    const r=await lpFetch(`${LP_PROXY}/search?type=parcelnumb&query=${encodeURIComponent(apn)}&state=${state}`);
     if(!r.ok){lpSetPill(1,'error');lpSetStatus('Search failed — HTTP '+r.status+'. Check your JWT token.','error');return;}
     searchRes=await r.json();
   }catch(e){
@@ -798,7 +778,7 @@ async function lpRunSteps2and3(feature){
   lpSetStatus('Fetching property data…');
   let propData;
   try{
-    const r=await lpFetch(`${LP_BASE}/property-data?propertyid=${propertyid}&fips=${fips}`);
+    const r=await lpFetch(`${LP_PROXY}/property-data?propertyid=${propertyid}&fips=${fips}`);
     if(!r.ok){lpSetPill(2,'error');lpSetStatus('Property data failed — HTTP '+r.status,'error');return;}
     propData=await r.json();
   }catch(e){lpSetPill(2,'error');lpSetStatus('Property data error: '+e.message,'error');return;}
@@ -809,7 +789,7 @@ async function lpRunSteps2and3(feature){
   lpSetPill(3,'active');
   lpSetStatus('Requesting comp report (may take ~20s)…');
   try{
-    const postR=await lpFetch(`${LP_BASE}/reports`,{method:'POST',body:JSON.stringify({propertyid,fips})});
+    const postR=await lpFetch(`${LP_PROXY}/reports`,{method:'POST',body:JSON.stringify({propertyid,fips})});
     if(!postR.ok&&postR.status!==202){lpSetPill(3,'error');lpSetStatus('Comp report request failed — HTTP '+postR.status,'error');showLpRaw();return;}
   }catch(e){lpSetPill(3,'error');lpSetStatus('Comp report error: '+e.message,'error');return;}
   let report=null;
@@ -817,7 +797,7 @@ async function lpRunSteps2and3(feature){
     await new Promise(res=>setTimeout(res,2500));
     lpSetStatus(`Waiting for comp report… (${i+1}/15)`);
     try{
-      const getR=await lpFetch(`${LP_BASE}/reports?propertyid=${propertyid}&fips=${fips}`);
+      const getR=await lpFetch(`${LP_PROXY}/reports?propertyid=${propertyid}&fips=${fips}`);
       if(getR.ok){const d=await getR.json();if(d&&!(d.message||'').toLowerCase().includes('not found')){report=d;break;}}
     }catch(e){/* keep polling */}
   }
@@ -1178,7 +1158,6 @@ function clearDD(){
 
 renderSavedDeals();
 renderDDChecklist();
-updateLpJwtStatus();
 </script>
 </body>
 </html>

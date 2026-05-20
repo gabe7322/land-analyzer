@@ -633,21 +633,21 @@ function analyze(){
       tiersContent.innerHTML='<div style="font-size:12px;color:var(--ds-white-faint);">Add comparable sales to generate offer tiers.</div>';
     } else {
       const tiers=[1000,2500,5000,7500,10000,15000,20000];
-      // find closest tier to user's entered wholesaleFee
       let closestIdx=0,minDist=Infinity;
-      tiers.forEach((t,i)=>{const d=Math.abs((wholesaleFee-totalCosts)-t);if(d<minDist){minDist=d;closestIdx=i;}});
+      tiers.forEach((t,i)=>{const d=Math.abs(wholesaleFee-t);if(d<minDist){minDist=d;closestIdx=i;}});
       const rows=tiers.map((targetProfit,i)=>{
-        const fee=targetProfit+totalCosts;   // gross fee needed
-        const offerToSeller=mao-fee;         // ceiling on what you pay the seller
-        const assignmentPrice=mao;           // end buyer pays MAO
-        const roi=offerToSeller>0?(targetProfit/(offerToSeller+totalCosts)*100):null;
+        // MAO already has costs removed (arv*0.70 - costs). Assignment fee = profit only — no double-subtract.
+        const assignmentFee=targetProfit;
+        const maxOfferToSeller=mao-assignmentFee;
+        const endBuyerPrice=mao;
+        const roi=maxOfferToSeller>0?(targetProfit/maxOfferToSeller*100):null;
         const isCurrent=i===closestIdx;
-        const na=offerToSeller<=0;
+        const na=maxOfferToSeller<=0;
         return`<tr class="${isCurrent?'tier-current':''} ${na?'tier-na':''}">
           <td><span class="tier-profit">${fmt(targetProfit)} profit</span></td>
-          <td>${na?'<span class="tier-na-label">not achievable</span>':fmt(offerToSeller)}</td>
-          <td>${na?'—':fmt(fee)}</td>
-          <td>${na?'—':fmt(assignmentPrice)}</td>
+          <td>${na?'<span class="tier-na-label">not achievable</span>':fmt(maxOfferToSeller)}</td>
+          <td>${na?'—':fmt(assignmentFee)}</td>
+          <td>${na?'—':fmt(endBuyerPrice)}</td>
           <td>${na||roi===null?'—':roi.toFixed(0)+'%'}</td>
         </tr>`;
       }).join('');
@@ -656,13 +656,13 @@ function analyze(){
           <thead><tr>
             <th>Net profit</th>
             <th>Max offer to seller</th>
-            <th>Wholesale fee</th>
-            <th>Assign price</th>
+            <th>Assignment fee</th>
+            <th>End buyer price</th>
             <th>ROI</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
-        <div style="font-size:11px;color:var(--ds-white-faint);margin-top:10px;">Assign price = MAO. Highlighted row is closest to your entered wholesale fee.</div>`;
+        <div style="font-size:11px;color:var(--ds-white-faint);margin-top:10px;">End buyer price = MAO (${fmt(mao)}). Max offer to seller = MAO − assignment fee. Highlighted row nearest your target fee.</div>`;
     }
   } else {
     tiersCard.style.display='none';
@@ -926,44 +926,143 @@ function autofillDDFromLP(){
   const search=lpRawData.search?.data?.features?.[0]?.properties||{};
   const prop=lpRawData.property?.data?.property||{};
   const report=lpRawData.report?.data||{};
+
+  // === Core property signals ===
   const county=(search.county||prop.situscounty||'').toLowerCase();
-  const state=(search.state||prop.situsstate||'').toLowerCase();
+  const state=(search.state||prop.situsstate||prop.situs_state||'').toLowerCase();
+  const isFL=state==='fl'||state==='florida';
   const FL_TARGETS=['lee','pasco','polk','osceola','marion'];
   const AZ_TARGETS=['mohave','pinal','yavapai'];
   const isTarget=FL_TARGETS.some(c=>county.includes(c))||AZ_TARGETS.some(c=>county.includes(c));
+
   const acres=parseFloat(prop.lotsizeacres||prop.calc_acres||report.size||0);
   const hasBuildings=parseFloat(prop.buildingarea||0)>0||parseFloat(prop.sumbuildingsqft||0)>0;
   const inSubdivision=!!(prop.subdivisionname);
   const hasApn=!!(search.apn||prop.apn);
+
+  // === Flood / wetlands ===
   const fema=parseFloat(prop.fema_cover_percentage||report.fema_cover_percentage||0);
   const floodText=(prop.flfemafloodzone||'').toLowerCase();
   const notInFlood=fema===0&&(floodText.includes('not in')||prop.fema_cover_percentage==='0'||report.fema_cover_percentage==='0');
-  const landLocked=prop.land_locked===true||prop.land_locked===1||report.land_locked===true;
-  const roadFrontage=parseFloat(prop.road_frontage||report.road_frontage||0);
-  const buildability=parseFloat(prop.buildability_total_perc||0);
+  const inFloodAEVE=floodText.includes(' ae')||floodText.includes(' ve')||floodText.includes(' ao')||floodText.startsWith('ae')||floodText.startsWith('ve')||floodText.startsWith('ao')||fema>50;
   const wetlandsPct=parseFloat(prop.wetlands_cover_percentage||report.wetlands_cover_percentage||0);
   const hasWetlandsData=prop.wetlands_cover_percentage!=null||report.wetlands_cover_percentage!=null;
+
+  // === Access ===
+  const landLocked=prop.land_locked===true||prop.land_locked===1||report.land_locked===true;
+  const roadFrontage=parseFloat(prop.road_frontage||report.road_frontage||0);
+
+  // === Buildability ===
+  const buildability=parseFloat(prop.buildability_total_perc||0);
+
+  // === Absentee / ownership signals ===
+  const mailingState=(prop.mailingstate||prop.mailing_state||'').toLowerCase().trim();
+  const situsState=(prop.situsstate||prop.situs_state||search.state||'').toLowerCase().trim();
+  const isAbsentee=mailingState&&situsState&&mailingState!==situsState;
+
+  // === Holding period ===
+  const lastSaleYear=parseInt(prop.lastsaleyear||prop.lastsale_year||prop.saleyear||0);
+  const currentYear=new Date().getFullYear();
+  const held5Plus=lastSaleYear>0&&(currentYear-lastSaleYear)>=5;
+
+  // === Tax delinquency ===
+  const taxDelinquent=!!(prop.taxdeliquentyear||prop.taxdelinquent||prop.tax_delinquent_year||prop.taxdeliquent);
+
+  // === Permit activity ===
+  const lpHasPermitData=prop.permit_count!=null||prop.permitcount!=null;
+  const permitCount=parseInt(prop.permit_count||prop.permitcount||0);
+  const noRecentPermits=lpHasPermitData&&permitCount===0;
+
+  // === HOA / zoning from auto-filled form fields ===
+  const zoningVal=document.getElementById('zoning').value;
+  const hoaVal=document.getElementById('hoa').value;
+  const lpHasHoaData=prop.hoa!=null||prop.hoa_monthly!=null||prop.hoamonthly!=null||prop.hoayn!=null;
+  const hoaStatusKnown=lpHasHoaData||inSubdivision;
+
+  // === Conservation easement ===
+  const hasConservationEasement=prop.conservation_easement===true||prop.conservation_easement===1||prop.conservationeasement===true;
+
+  // === FL sinkhole — already confirmed on analyzer tab ===
+  const sinkholeChecked=document.getElementById('flSinkhole').checked;
+
+  // === Comps from LP similars ===
+  const activeCompIds=comps.filter(id=>document.getElementById('comp-'+id));
+  const compCount=activeCompIds.length;
+  const compsFromLP=compCount>0&&!!(prop.similars);
+
+  // Comp date check — all within 18 months
+  let allCompsRecent=false;
+  if(compsFromLP&&compCount>0){
+    const now=new Date();
+    const cutoff=new Date(now.getFullYear(),now.getMonth()-18,1);
+    const cutoffStr=`${cutoff.getFullYear()}-${String(cutoff.getMonth()+1).padStart(2,'0')}`;
+    const dates=activeCompIds.map(id=>{const row=document.getElementById('comp-'+id);return row?row.querySelectorAll('input')[3].value:'';});
+    allCompsRecent=dates.length>0&&dates.every(d=>d&&d>=cutoffStr);
+  }
+
+  // Comp size similarity — all within 25% of subject acreage
+  let allCompsSimilarSize=false;
+  if(compsFromLP&&compCount>0&&acres>0){
+    const compAcres=activeCompIds.map(id=>{const row=document.getElementById('comp-'+id);return row?parseFloat(row.querySelectorAll('input')[1].value)||0:0;}).filter(a=>a>0);
+    allCompsSimilarSize=compAcres.length>0&&compAcres.every(a=>Math.abs(a-acres)/acres<=0.25);
+  }
+
+  // === Build positive checks ===
   const checks={};
-  // Section 1
-  if(isTarget)checks['p1']=true;
-  if(acres>0&&acres<2.0)checks['p5']=true;
-  if(!hasBuildings)checks['p6']=true;
-  if(inSubdivision)checks['p7']=true;
-  if(notInFlood)checks['p8']=true;
-  if(hasApn)checks['p9']=true;
-  // Section 2
-  if(!landLocked&&roadFrontage>0)checks['q1']=true;
-  if(!landLocked)checks['q3']=true;
-  if(!landLocked&&roadFrontage>0)checks['q4']=true;
-  if(notInFlood)checks['q14']=true;
-  if(hasWetlandsData&&wetlandsPct===0)checks['q15']=true;
-  if(notInFlood)checks['q18']=true;
-  if(buildability>70)checks['q29']=true;
+
+  // Section 1 — Pre-Offer Filters
+  if(isTarget) checks['p1']=true;
+  if(compsFromLP&&allCompsRecent) checks['p2']=true;
+  if(acres>0&&acres<2.0) checks['p5']=true;
+  if(!hasBuildings) checks['p6']=true;
+  if(inSubdivision) checks['p7']=true;
+  if(notInFlood) checks['p8']=true;
+  if(hasApn) checks['p9']=true;
+  if(isAbsentee) checks['p10']=true;
+  if(held5Plus) checks['p11']=true;
+  if(taxDelinquent) checks['p12']=true;
+  if(noRecentPermits) checks['p15']=true;
+
+  // Section 2 — Property Qualification
+  if(!landLocked&&roadFrontage>0) checks['q1']=true;
+  if(!landLocked) checks['q3']=true;
+  if(!landLocked&&roadFrontage>0) checks['q4']=true;
+  if(!landLocked&&roadFrontage>0) checks['q5']=true;
+  if(zoningVal&&zoningVal!=='') checks['q10']=true;
+  if(hoaStatusKnown) checks['q13']=true;
+  if(notInFlood) checks['q14']=true;
+  if(hasWetlandsData&&wetlandsPct===0) checks['q15']=true;
+  if(notInFlood) checks['q18']=true;
+  if(isFL&&sinkholeChecked) checks['q19']=true;
+  if(buildability>70) checks['q29']=true;
+
+  // Section 3 — Comp Methodology
+  if(compsFromLP&&compCount>=3) checks['c1']=true;
+  if(compsFromLP&&compCount>0) checks['c2']=true;
+  if(compsFromLP&&allCompsRecent) checks['c3']=true;
+  if(compsFromLP&&allCompsSimilarSize) checks['c4']=true;
+  if(compsFromLP&&compCount>0) checks['c7']=true;
+  if(compsFromLP&&compCount>0) checks['c8']=true;
+
+  // === Build deal killer flags (these are bad — check if condition applies) ===
+  const killers={};
+  if(landLocked&&roadFrontage===0) killers['k1']=true;
+  if(inFloodAEVE) killers['k2']=true;
+  if(hasWetlandsData&&wetlandsPct>30) killers['k5']=true;
+  if(hasConservationEasement) killers['k12']=true;
+
+  // === Apply to DOM ===
   let count=0;
   Object.entries(checks).forEach(([id,val])=>{const el=document.getElementById('dd_'+id);if(el&&val){el.checked=true;count++;}});
+  let killerCount=0;
+  Object.entries(killers).forEach(([id,val])=>{const el=document.getElementById('dd_'+id);if(el&&val){el.checked=true;killerCount++;}});
+
   updateDDProgress();
   setTab('dd');
-  document.getElementById('lpDDFillStatus').textContent=`${count} items confirmed from LandPortal data`;
+  let msg=`${count} items confirmed from LandPortal data`;
+  if(killerCount>0) msg+=` · ${killerCount} deal killer flag${killerCount>1?'s':''} raised — review flags below`;
+  document.getElementById('lpDDFillStatus').textContent=msg;
+  document.getElementById('lpDDFillStatus').style.color=killerCount>0?'var(--ds-danger)':'var(--ds-white-faint)';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 

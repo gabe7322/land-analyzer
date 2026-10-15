@@ -1374,6 +1374,23 @@ function clearDD(){
 
 renderSavedDeals();
 renderDDChecklist();
+
+// GEO pre-fill: ?apn=XXXX&state=FL opens with lookup pre-triggered
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const apn    = params.get('apn');
+  const state  = params.get('state');
+  if (!apn || !state) return;
+  const apnEl   = document.getElementById('lpApn');
+  const stateEl = document.getElementById('lpState');
+  if (!apnEl || !stateEl) return;
+  apnEl.value   = apn;
+  stateEl.value = state.toUpperCase();
+  // Switch to the analyzer tab if tabs exist, then trigger lookup
+  const analyzerTab = document.querySelector('[data-tab="analyzer"], [onclick*="analyzer"]');
+  if (analyzerTab) analyzerTab.click();
+  setTimeout(() => lpLookup(), 300);
+})();
 </script>
 </body>
 </html>
